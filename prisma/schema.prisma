@@ -1,0 +1,228 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id        Int      @id @default(autoincrement()) @map("ma_vai_tro")
+  name      RoleName @default(CUSTOMER) @map("ten_vai_tro")
+  createdAt DateTime @default(now()) @map("ngay_tao")
+  updatedAt DateTime @updatedAt @map("ngay_cap_nhat")
+  User      User[]
+
+  @@map("vai_tro")
+}
+
+model User {
+  id        Int      @id @default(autoincrement()) @map("ma_nguoi_dung")
+  username  String   @unique @map("ten_dang_nhap") @db.VarChar(100)
+  password  String   @map("mat_khau") @db.VarChar(100)
+  name      String   @map("ten_nguoi_dung") @db.VarChar(255)
+  email     String?  @unique @map("email") @db.VarChar(100)
+  phone     String?  @unique @map("so_dien_thoai") @db.VarChar(11)
+  gender    Gender?  @default(OTHER) @map("gioi_tinh")
+  address   String?  @map("dia_chi")
+  avatarUrl String?  @map("avatar_url") @db.LongText
+  role      Role     @relation(fields: [roleId], references: [id])
+  roleId    Int      @map("ma_vai_tro")
+  createdAt DateTime @default(now()) @map("ngay_tao")
+  updatedAt DateTime @updatedAt @map("ngay_cap_nhat")
+  status    Boolean  @default(true) @map("trang_thai")
+  Order     Order[]
+  Review    Review[]
+
+  @@map("nguoi_dung")
+}
+
+model CarBrand {
+  id        Int        @id @default(autoincrement()) @map("ma_hang_xe")
+  name      String     @unique @map("ten_hang_xe") @db.VarChar(255)
+  createdAt DateTime   @default(now()) @map("ngay_tao")
+  updatedAt DateTime   @updatedAt @map("ngay_cap_nhat")
+  CarModel  CarModel[]
+
+  @@map("hang_xe")
+}
+
+model CarModel {
+  id        Int      @id @default(autoincrement()) @map("ma_mau_xe")
+  name      String   @unique @map("ten_mau_xe") @db.VarChar(255)
+  brand     CarBrand @relation(fields: [brandId], references: [id])
+  brandId   Int      @map("ma_hang_xe")
+  createdAt DateTime @default(now()) @map("ngay_tao")
+  updatedAt DateTime @updatedAt @map("ngay_cap_nhat")
+  Car       Car[]
+
+  @@map("mau_xe")
+}
+
+model Car {
+  id                Int           @id @default(autoincrement()) @map("ma_xe")
+  name              String        @map("ten_xe") @db.VarChar(255)
+  licensePlates     String        @unique @map("bien_so_xe") @db.VarChar(10)
+  seat              Int           @map("so_cho")
+  yearOfManufacture Int           @map("nam_san_xuat")
+  transmission      Transmission  @default(AUTOMATIC_TRANSMISSION) @map("loai_hop_so")
+  fuel              Fuel          @default(GASOLINE) @map("nhien_lieu")
+  description       String        @map("mo_ta") @db.Text
+  pricePerDay       Decimal       @map("gia_thue_theo_ngay") @db.Decimal(10, 2)
+  status            Boolean       @default(true) @map("trang_thai")
+  model             CarModel      @relation(fields: [modelId], references: [id])
+  modelId           Int           @map("ma_mau_xe")
+  createdAt         DateTime      @default(now()) @map("ngay_tao")
+  updatedAt         DateTime      @updatedAt @map("ngay_cap_nhat")
+  carColorId        Int?          @map("ma_mau_sac_xe")
+  CarFeature        CarFeature[]
+  OrderDetail       OrderDetail[]
+  Review            Review[]
+  CarColor          CarColor?     @relation(fields: [carColorId], references: [id])
+
+  @@map("xe")
+}
+
+model CarColor {
+  id        Int        @id @default(autoincrement()) @map("ma_mau_sac_xe")
+  name      String     @unique @map("ten_mau_sac_xe") @db.VarChar(255)
+  createdAt DateTime   @default(now()) @map("ngay_tao")
+  updatedAt DateTime   @updatedAt @map("ngay_cap_nhat")
+  Car       Car[]
+  CarImage  CarImage[]
+
+  @@map("mau_sac_xe")
+}
+
+model CarImage {
+  id         Int      @id @default(autoincrement()) @map("ma_hinh_anh_xe")
+  url        String   @map("url") @db.LongText
+  carColor   CarColor @relation(fields: [carColorId], references: [id])
+  carColorId Int      @map("ma_mau_sac_xe")
+  createdAt  DateTime @default(now()) @map("ngay_tao")
+  updatedAt  DateTime @updatedAt @map("ngay_cap_nhat")
+
+  @@map("hinh_anh_xe")
+}
+
+model Feature {
+  id         Int          @id @default(autoincrement()) @map("ma_tinh_nang")
+  name       FeatureName  @unique @map("ten_tinh_nang")
+  createdAt  DateTime     @default(now()) @map("ngay_tao")
+  updatedAt  DateTime     @updatedAt @map("ngay_cap_nhat")
+  CarFeature CarFeature[]
+
+  @@map("tinh_nang")
+}
+
+model CarFeature {
+  id        Int      @id @default(autoincrement()) @map("ma_tinh_nang_xe")
+  car       Car      @relation(fields: [carId], references: [id])
+  carId     Int      @map("ma_xe")
+  feature   Feature  @relation(fields: [featureId], references: [id])
+  featureId Int      @map("ma_tinh_nang")
+  createdAt DateTime @default(now()) @map("ngay_tao")
+  updatedAt DateTime @updatedAt @map("ngay_cap_nhat")
+
+  @@map("tinh_nang_xe")
+}
+
+model Order {
+  id          Int           @id @default(autoincrement()) @map("ma_don_hang")
+  startDate   DateTime      @map("ngay_bat_dau")
+  endDate     DateTime      @map("ngay_ket_thuc")
+  totalAmount Decimal       @map("tong_tien") @db.Decimal(10, 2)
+  customer    User          @relation(fields: [customerId], references: [id])
+  customerId  Int           @map("ma_nguoi_dung")
+  status      OrderStatus   @default(PENDING) @map("trang_thai")
+  createdAt   DateTime      @default(now()) @map("ngay_tao")
+  updatedAt   DateTime      @updatedAt @map("ngay_cap_nhat")
+  OrderDetail OrderDetail[]
+
+  @@map("don_hang")
+}
+
+model OrderDetail {
+  id          Int         @id @default(autoincrement()) @map("ma_chi_tiet_don_hang")
+  order       Order       @relation(fields: [orderId], references: [id])
+  orderId     Int         @map("ma_don_hang")
+  car         Car         @relation(fields: [carId], references: [id])
+  carId       Int         @map("ma_xe")
+  startDate   DateTime    @map("ngay_bat_dau")
+  endDate     DateTime    @map("ngay_ket_thuc")
+  totalAmount Decimal     @map("tong_tien") @db.Decimal(10, 2)
+  status      OrderStatus @default(PENDING) @map("trang_thai")
+  createdAt   DateTime    @default(now()) @map("ngay_tao")
+  updatedAt   DateTime    @updatedAt @map("ngay_cap_nhat")
+
+  @@map("chi_tiet_don_hang")
+}
+
+model Review {
+  id         Int      @id @default(autoincrement()) @map("ma_danh_gia")
+  content    String   @map("noi_dung") @db.Text
+  rating     Int      @map("danh_gia")
+  car        Car      @relation(fields: [carId], references: [id])
+  carId      Int      @map("ma_xe")
+  customer   User     @relation(fields: [customerId], references: [id])
+  customerId Int      @map("ma_nguoi_dung")
+  createdAt  DateTime @default(now()) @map("ngay_tao")
+  updatedAt  DateTime @updatedAt @map("ngay_cap_nhat")
+
+  @@map("danh_gia")
+}
+
+enum RoleName {
+  ADMIN    @map("QUAN_TRI_VIEN")
+  CAROWNER @map("CHU_XE")
+  CUSTOMER @map("NGUOI_THUE_XE")
+}
+
+enum Gender {
+  MALE   @map("nam")
+  FEMALE @map("nu")
+  OTHER  @map("khac")
+}
+
+enum Transmission {
+  AUTOMATIC_TRANSMISSION @map("so_tu_dong")
+  MANUAL_TRANSMISSION    @map("so_san")
+}
+
+enum Fuel {
+  GASOLINE @map("xang")
+  DIESEL   @map("dau")
+  ELECTRIC @map("dien")
+}
+
+enum OrderStatus {
+  PENDING   @map("cho_xac_nhan")
+  CONFIRMED @map("da_xac_nhan")
+  CANCELED  @map("da_huy")
+  COMPLETED @map("da_hoan_thanh")
+}
+
+enum FeatureName {
+  AIR_CONDITIONING @map("dieu_hoa")
+  RADIO            @map("radio")
+  USB              @map("usb")
+  BLUETOOTH        @map("bluetooth")
+  GPS              @map("gps")
+  PARKING_SENSOR   @map("cam_bien_lui")
+  CAMERA           @map("camera")
+  SUNROOF          @map("cua_so_troi")
+  KEYLESS          @map("khoa_khong_can_chia_khoa")
+  ALARM            @map("chong_trom")
+  AIRBAG           @map("tui_khi")
+  AUTO_BRAKE       @map("ho_tro_phanh_khan_cap")
+  AUTO_WIPER       @map("gat_mua_tu_dong")
+  LANE_KEEPING     @map("giu_lan")
+  BLIND_SPOT       @map("canh_bao_diem_mu")
+  REAR_TRAFFIC     @map("canh_bao_xe_phia_sau")
+  TIRE_PRESSURE    @map("canh_bao_ap_xe")
+  KID_SEAT         @map("ghe_tre_em")
+}
