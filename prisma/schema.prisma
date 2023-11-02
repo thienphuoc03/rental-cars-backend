@@ -24,17 +24,17 @@ model User {
   id        Int      @id @default(autoincrement()) @map("ma_nguoi_dung")
   username  String   @unique @map("ten_dang_nhap") @db.VarChar(100)
   password  String   @map("mat_khau") @db.VarChar(100)
-  name      String   @map("ten_nguoi_dung") @db.VarChar(255)
+  name      String?  @map("ten_nguoi_dung") @db.VarChar(255)
   email     String?  @unique @map("email") @db.VarChar(100)
   phone     String?  @unique @map("so_dien_thoai") @db.VarChar(11)
   gender    Gender?  @default(OTHER) @map("gioi_tinh")
   address   String?  @map("dia_chi")
   avatarUrl String?  @map("avatar_url") @db.LongText
-  role      Role     @relation(fields: [roleId], references: [id])
-  roleId    Int      @map("ma_vai_tro")
+  role      Role?    @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  roleId    Int?     @map("ma_vai_tro")
   createdAt DateTime @default(now()) @map("ngay_tao")
   updatedAt DateTime @updatedAt @map("ngay_cap_nhat")
-  status    Boolean  @default(true) @map("trang_thai")
+  status    Boolean? @default(true) @map("trang_thai")
   Order     Order[]
   Review    Review[]
 
@@ -52,12 +52,12 @@ model CarBrand {
 }
 
 model CarModel {
-  id        Int      @id @default(autoincrement()) @map("ma_mau_xe")
-  name      String   @unique @map("ten_mau_xe") @db.VarChar(255)
-  brand     CarBrand @relation(fields: [brandId], references: [id])
-  brandId   Int      @map("ma_hang_xe")
-  createdAt DateTime @default(now()) @map("ngay_tao")
-  updatedAt DateTime @updatedAt @map("ngay_cap_nhat")
+  id        Int       @id @default(autoincrement()) @map("ma_mau_xe")
+  name      String    @unique @map("ten_mau_xe") @db.VarChar(255)
+  brand     CarBrand? @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  brandId   Int?      @map("ma_hang_xe")
+  createdAt DateTime  @default(now()) @map("ngay_tao")
+  updatedAt DateTime  @updatedAt @map("ngay_cap_nhat")
   Car       Car[]
 
   @@map("mau_xe")
@@ -66,6 +66,7 @@ model CarModel {
 model Car {
   id                Int           @id @default(autoincrement()) @map("ma_xe")
   name              String        @map("ten_xe") @db.VarChar(255)
+  slug              String        @unique @map("slug") @db.VarChar(255)
   licensePlates     String        @unique @map("bien_so_xe") @db.VarChar(10)
   seat              Int           @map("so_cho")
   yearOfManufacture Int           @map("nam_san_xuat")
@@ -73,16 +74,16 @@ model Car {
   fuel              Fuel          @default(GASOLINE) @map("nhien_lieu")
   description       String        @map("mo_ta") @db.Text
   pricePerDay       Decimal       @map("gia_thue_theo_ngay") @db.Decimal(10, 2)
-  status            Boolean       @default(true) @map("trang_thai")
-  model             CarModel      @relation(fields: [modelId], references: [id])
-  modelId           Int           @map("ma_mau_xe")
+  status            Boolean?      @default(true) @map("trang_thai")
+  model             CarModel?     @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  modelId           Int?          @map("ma_mau_xe")
   createdAt         DateTime      @default(now()) @map("ngay_tao")
   updatedAt         DateTime      @updatedAt @map("ngay_cap_nhat")
-  carColorId        Int?          @map("ma_mau_sac_xe")
   CarFeature        CarFeature[]
   OrderDetail       OrderDetail[]
   Review            Review[]
-  CarColor          CarColor?     @relation(fields: [carColorId], references: [id])
+  CarColor          CarColor?     @relation(fields: [carColorId], references: [id], onDelete: Cascade)
+  carColorId        Int?          @map("ma_mau_sac_xe")
 
   @@map("xe")
 }
@@ -99,12 +100,12 @@ model CarColor {
 }
 
 model CarImage {
-  id         Int      @id @default(autoincrement()) @map("ma_hinh_anh_xe")
-  url        String   @map("url") @db.LongText
-  carColor   CarColor @relation(fields: [carColorId], references: [id])
-  carColorId Int      @map("ma_mau_sac_xe")
-  createdAt  DateTime @default(now()) @map("ngay_tao")
-  updatedAt  DateTime @updatedAt @map("ngay_cap_nhat")
+  id         Int       @id @default(autoincrement()) @map("ma_hinh_anh_xe")
+  url        String    @map("url") @db.LongText
+  carColor   CarColor? @relation(fields: [carColorId], references: [id], onDelete: Cascade)
+  carColorId Int?      @map("ma_mau_sac_xe")
+  createdAt  DateTime  @default(now()) @map("ngay_tao")
+  updatedAt  DateTime  @updatedAt @map("ngay_cap_nhat")
 
   @@map("hinh_anh_xe")
 }
@@ -121,10 +122,10 @@ model Feature {
 
 model CarFeature {
   id        Int      @id @default(autoincrement()) @map("ma_tinh_nang_xe")
-  car       Car      @relation(fields: [carId], references: [id])
-  carId     Int      @map("ma_xe")
-  feature   Feature  @relation(fields: [featureId], references: [id])
-  featureId Int      @map("ma_tinh_nang")
+  car       Car?     @relation(fields: [carId], references: [id], onDelete: Cascade)
+  carId     Int?     @map("ma_xe")
+  feature   Feature? @relation(fields: [featureId], references: [id], onDelete: Cascade)
+  featureId Int?     @map("ma_tinh_nang")
   createdAt DateTime @default(now()) @map("ngay_tao")
   updatedAt DateTime @updatedAt @map("ngay_cap_nhat")
 
@@ -136,8 +137,8 @@ model Order {
   startDate   DateTime      @map("ngay_bat_dau")
   endDate     DateTime      @map("ngay_ket_thuc")
   totalAmount Decimal       @map("tong_tien") @db.Decimal(10, 2)
-  customer    User          @relation(fields: [customerId], references: [id])
-  customerId  Int           @map("ma_nguoi_dung")
+  customer    User?         @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customerId  Int?          @map("ma_nguoi_dung")
   status      OrderStatus   @default(PENDING) @map("trang_thai")
   createdAt   DateTime      @default(now()) @map("ngay_tao")
   updatedAt   DateTime      @updatedAt @map("ngay_cap_nhat")
@@ -148,10 +149,10 @@ model Order {
 
 model OrderDetail {
   id          Int         @id @default(autoincrement()) @map("ma_chi_tiet_don_hang")
-  order       Order       @relation(fields: [orderId], references: [id])
-  orderId     Int         @map("ma_don_hang")
-  car         Car         @relation(fields: [carId], references: [id])
-  carId       Int         @map("ma_xe")
+  order       Order?      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId     Int?        @map("ma_don_hang")
+  car         Car?        @relation(fields: [carId], references: [id], onDelete: Cascade)
+  carId       Int?        @map("ma_xe")
   startDate   DateTime    @map("ngay_bat_dau")
   endDate     DateTime    @map("ngay_ket_thuc")
   totalAmount Decimal     @map("tong_tien") @db.Decimal(10, 2)
@@ -166,10 +167,10 @@ model Review {
   id         Int      @id @default(autoincrement()) @map("ma_danh_gia")
   content    String   @map("noi_dung") @db.Text
   rating     Int      @map("danh_gia")
-  car        Car      @relation(fields: [carId], references: [id])
-  carId      Int      @map("ma_xe")
-  customer   User     @relation(fields: [customerId], references: [id])
-  customerId Int      @map("ma_nguoi_dung")
+  car        Car?     @relation(fields: [carId], references: [id], onDelete: Cascade)
+  carId      Int?     @map("ma_xe")
+  customer   User?    @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customerId Int?     @map("ma_nguoi_dung")
   createdAt  DateTime @default(now()) @map("ngay_tao")
   updatedAt  DateTime @updatedAt @map("ngay_cap_nhat")
 
