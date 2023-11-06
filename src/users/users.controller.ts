@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -149,7 +157,7 @@ export class UsersController {
   @ApiResponse({ status: 500, description: 'Internal server error' })
   @ApiParam({ name: 'id', required: true, type: Number })
   @ApiBody({ type: UpdateUserDto })
-  @Post(':id')
+  @Put(':id')
   updateUser(
     @Param('id') id: number,
     @Body() updateUserDto: UpdateUserDto,
