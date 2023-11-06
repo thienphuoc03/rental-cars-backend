@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -13,15 +14,16 @@ import {
   ApiExtraModels,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiResponse,
   ApiTags,
   getSchemaPath,
 } from '@nestjs/swagger';
-import { MetaSchema } from 'schemas';
 
 import { CreateUserDto, UserDto } from './dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
+import { MetaSchema } from '../../schemas';
 
 @ApiBearerAuth()
 @ApiTags('Users')
@@ -61,12 +63,12 @@ export class UsersController {
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @ApiResponse({ status: 500, description: 'Internal server error' })
-  @ApiParam({ name: 'page', required: false, type: Number })
-  @ApiParam({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
   @Get()
   getAllUsers(
-    @Param('page') page: number,
-    @Param('limit') limit: number,
+    @Query('page') page: number,
+    @Query('limit') limit: number,
   ): Promise<any> {
     return this.usersService.getAllUsers(page, limit);
   }
@@ -111,7 +113,7 @@ export class UsersController {
   })
   @ApiResponse({ status: 500, description: 'Internal server error' })
   @ApiParam({ name: 'username', required: true, type: String })
-  @Get(':username')
+  @Get('/username/:username')
   getUserByUsername(@Param('username') username: string): Promise<UserDto> {
     return this.usersService.getUserByUsername(username);
   }

@@ -1,7 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { RoleName } from '@prisma/client';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { getPagination } from 'utils/utils';
+import * as bcrypt from 'bcrypt';
+
+import { getPagination } from '../../utils/utils';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class UsersService {
@@ -61,6 +63,7 @@ export class UsersService {
       select: {
         id: true,
         name: true,
+        username: true,
         email: true,
         phone: true,
         gender: true,
@@ -79,7 +82,9 @@ export class UsersService {
 
     if (!user) throw new NotFoundException(`User with id ${id} not found`);
 
-    return user;
+    const userResponse = { ...user, role: user.role.name };
+
+    return userResponse;
   }
 
   async getUserByUsername(username: string): Promise<any> {
@@ -90,6 +95,7 @@ export class UsersService {
       select: {
         id: true,
         name: true,
+        username: true,
         email: true,
         phone: true,
         gender: true,
@@ -109,7 +115,9 @@ export class UsersService {
     if (!user)
       throw new NotFoundException(`User with username ${username} not found`);
 
-    return user;
+    const userResponse = { ...user, role: user.role.name };
+
+    return userResponse;
   }
 
   async createUser(data: any): Promise<any> {
@@ -124,37 +132,93 @@ export class UsersService {
 
     delete data.role;
 
+    // hash password
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+
     const user = await this.prismaService.user.create({
       data: {
         ...data,
+        password: hashedPassword,
         roleId: Number(roleId.id),
+      },
+      select: {
+        id: true,
+        name: true,
+        username: true,
+        email: true,
+        phone: true,
+        gender: true,
+        address: true,
+        avatarUrl: true,
+        status: true,
+        role: {
+          select: {
+            name: true,
+          },
+        },
+        createdAt: true,
+        updatedAt: true,
       },
     });
 
-    return user;
+    const userResponse = { ...user, role: user.role.name };
+
+    return userResponse;
   }
 
   async updateUser(id: number, data: any): Promise<any> {
+    // hash password
+    if (data.password) {
+      const hashedPassword = await bcrypt.hash(data.password, 10);
+      data.password = hashedPassword;
+    }
+
     const user = await this.prismaService.user.update({
       where: {
         id: Number(id),
       },
       data,
+      select: {
+        id: true,
+        name: true,
+        username: true,
+        email: true,
+        phone: true,
+        gender: true,
+        address: true,
+        avatarUrl: true,
+        status: true,
+        role: {
+          select: {
+            name: true,
+          },
+        },
+        createdAt: true,
+        updatedAt: true,
+      },
     });
 
     if (!user) throw new NotFoundException(`User with id ${id} not found`);
 
-    return user;
+    const userResponse = { ...user, role: user.role.name };
+
+    return userResponse;
   }
 
   async deleteUser(id: number): Promise<any> {
-    const user = await this.prismaService.user.delete({
+    const user = await this.prismaService.user.findUnique({
       where: {
         id: Number(id),
       },
     });
 
     if (!user) throw new NotFoundException(`User with id ${id} not found`);
+
+    await this.prismaService.user.delete({
+      where: {
+        id: Number(id),
+      },
+    });
 
     return `User: ${user.name} has been deleted`;
   }
