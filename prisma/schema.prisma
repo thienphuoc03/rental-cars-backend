@@ -21,20 +21,20 @@ model Role {
 }
 
 model User {
-  id        Int      @id @default(autoincrement()) @map("ma_nguoi_dung")
-  username  String   @unique @map("ten_dang_nhap") @db.VarChar(100)
-  password  String   @map("mat_khau") @db.VarChar(100)
-  name      String?  @map("ten_nguoi_dung") @db.VarChar(255)
-  email     String?  @unique @map("email") @db.VarChar(100)
-  phone     String?  @unique @map("so_dien_thoai") @db.VarChar(11)
-  gender    Gender?  @default(OTHER) @map("gioi_tinh")
-  address   String?  @map("dia_chi")
-  avatarUrl String?  @map("avatar_url") @db.LongText
-  role      Role?    @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  roleId    Int?     @map("ma_vai_tro")
-  createdAt DateTime @default(now()) @map("ngay_tao")
-  updatedAt DateTime @updatedAt @map("ngay_cap_nhat")
-  status    Boolean? @default(true) @map("trang_thai")
+  id        Int        @id @default(autoincrement()) @map("ma_nguoi_dung")
+  username  String     @unique @map("ten_dang_nhap") @db.VarChar(100)
+  password  String     @map("mat_khau") @db.VarChar(100)
+  name      String?    @map("ten_nguoi_dung") @db.VarChar(255)
+  email     String?    @unique @map("email") @db.VarChar(100)
+  phone     String?    @unique @map("so_dien_thoai") @db.VarChar(11)
+  gender    Gender?    @default(OTHER) @map("gioi_tinh")
+  address   String?    @map("dia_chi")
+  avatarUrl String?    @map("avatar_url") @db.LongText
+  role      Role?      @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  roleId    Int?       @map("ma_vai_tro")
+  createdAt DateTime   @default(now()) @map("ngay_tao")
+  updatedAt DateTime   @updatedAt @map("ngay_cap_nhat")
+  status    UserStatus @default(ACTIVE) @map("trang_thai")
   Order     Order[]
   Review    Review[]
 
@@ -74,7 +74,7 @@ model Car {
   fuel              Fuel          @default(GASOLINE) @map("nhien_lieu")
   description       String        @map("mo_ta") @db.Text
   pricePerDay       Decimal       @map("gia_thue_theo_ngay") @db.Decimal(10, 2)
-  status            Boolean?      @default(true) @map("trang_thai")
+  status            CarStatus     @default(AVAILABLE) @map("trang_thai")
   model             CarModel?     @relation(fields: [modelId], references: [id], onDelete: Cascade)
   modelId           Int?          @map("ma_mau_xe")
   createdAt         DateTime      @default(now()) @map("ngay_tao")
@@ -183,10 +183,21 @@ enum RoleName {
   CUSTOMER @map("NGUOI_THUE_XE")
 }
 
+enum UserStatus {
+  ACTIVE   @map("hoat_dong")
+  INACTIVE @map("khong_hoat_dong")
+}
+
 enum Gender {
   MALE   @map("nam")
   FEMALE @map("nu")
   OTHER  @map("khac")
+}
+
+enum CarStatus {
+  AVAILABLE   @map("san_sang")
+  RENTED      @map("da_thue")
+  UNAVAILABLE @map("khong_san_sang")
 }
 
 enum Transmission {

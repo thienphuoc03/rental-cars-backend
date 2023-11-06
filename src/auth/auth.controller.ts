@@ -1,6 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import {
-  ApiBearerAuth,
   ApiExtraModels,
   ApiOperation,
   ApiResponse,
@@ -12,7 +11,6 @@ import { AuthService } from './auth.service';
 import { SignInDto, SignUpDto } from './dto';
 import { SignInSchema, SignUpSchema } from './schemas';
 
-@ApiBearerAuth()
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
