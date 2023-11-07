@@ -39,4 +39,4 @@ The server will be running at http://localhost:8080
 
 #### APIs docs
 
-http://localhost:8080/apis-doc
+http://localhost:8080/api/v1/docs

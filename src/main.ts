@@ -1,4 +1,6 @@
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { AppModule } from './app.module';
 
@@ -11,6 +13,29 @@ async function bootstrap() {
 
   // Server
   app.setGlobalPrefix('api/v1');
+
+  // Config Validation
+  app.useGlobalPipes(new ValidationPipe());
+
+  // Config Swagger
+  const config = new DocumentBuilder()
+    .setTitle('Rental Cars APIs')
+    .setDescription('APIs for Rental Cars project with NestJS.')
+    .setVersion('1.0')
+    .addBasicAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'JWT',
+        description: 'Enter JWT token',
+        in: 'header',
+      },
+      'JWT-auth',
+    )
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api/v1/docs', app, document);
 
   await app.listen(PORT, HOSTNAME, async () => {
     console.log(
