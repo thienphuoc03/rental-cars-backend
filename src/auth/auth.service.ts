@@ -7,7 +7,6 @@ import { JwtService } from '@nestjs/jwt';
 import { RoleName } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
-import { SignInSchema } from './schemas';
 import { PrismaService } from '../prisma/prisma.service';
 
 interface signUpParams {
@@ -76,7 +75,7 @@ export class AuthService {
     return userResponse;
   }
 
-  async signIn({ username, password }: signInParams): Promise<SignInSchema> {
+  async signIn({ username, password }: signInParams): Promise<any> {
     const user = await this.prismaService.user.findFirst({
       where: {
         username,
@@ -88,6 +87,7 @@ export class AuthService {
         password: true,
         email: true,
         phone: true,
+        roleId: true,
         avatarUrl: true,
         createdAt: true,
         updatedAt: true,
@@ -111,25 +111,44 @@ export class AuthService {
     const { accessToken, refreshToken } = await this.generateToken(
       user.id,
       user.username,
+      user.roleId,
+      user.role.name,
     );
 
+    // Remove password from user object
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
+    const { password: _, roleId, ...userWithoutPassword } = user;
+
+    const userResponse = {
+      ...userWithoutPassword,
+      role: userWithoutPassword.role.name,
+    };
+
     return {
-      username: user.username,
-      role: user.role.name,
-      accessToken,
-      refreshToken,
+      user: userResponse,
+      tokens: {
+        accessToken,
+        refreshToken,
+      },
     };
   }
 
-  async generateToken(userId: number, username: string) {
-    const payload = { sub: userId, username };
+  async generateToken(
+    userId: number,
+    username: string,
+    roleId: number,
+    role: string,
+  ) {
+    const payload = { sub: userId, username, roleId, role };
 
     const accessToken = await this.jwtService.signAsync(payload, {
       expiresIn: '12h',
+      secret: process.env.ACCESS_TOKEN_SECRET,
     });
 
     const refreshToken = await this.jwtService.signAsync(payload, {
       expiresIn: '7d',
+      secret: process.env.REFRESH_TOKEN_SECRET,
     });
 
     return { accessToken, refreshToken };

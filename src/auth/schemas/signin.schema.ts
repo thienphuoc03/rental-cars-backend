@@ -1,17 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { UserDto } from 'src/users/dto';
 
 export class SignInSchema {
   @ApiProperty({
-    example: 'testuser',
-    type: String,
+    type: UserDto,
   })
-  username: string;
-
-  @ApiProperty({
-    example: 'CUSTOMER',
-    type: String,
-  })
-  role: string;
+  user: UserDto;
 
   @ApiProperty({
     example:

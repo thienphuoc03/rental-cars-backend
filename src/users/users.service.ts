@@ -28,6 +28,7 @@ export class UsersService {
       select: {
         id: true,
         name: true,
+        username: true,
         email: true,
         phone: true,
         gender: true,
@@ -44,8 +45,13 @@ export class UsersService {
       },
     });
 
+    // change role from object to string
+    const usersResponse = users.map((user) => {
+      return { ...user, role: user.role.name };
+    });
+
     return {
-      data: users,
+      data: usersResponse,
       meta: {
         totalPages,
         _page,

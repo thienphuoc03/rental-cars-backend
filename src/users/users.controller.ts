@@ -4,9 +4,10 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
-  Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -19,6 +20,9 @@ import {
   ApiTags,
   getSchemaPath,
 } from '@nestjs/swagger';
+import { RoleName } from '@prisma/client';
+import { Roles } from 'src/auth/decorators';
+import { RolesGuard } from 'src/auth/guards';
 
 import { CreateUserDto, UserDto } from './dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -66,6 +70,8 @@ export class UsersController {
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @Get()
+  @Roles(RoleName.ADMIN)
+  @UseGuards(RolesGuard)
   getAllUsers(
     @Query('page') page: number,
     @Query('limit') limit: number,
@@ -90,8 +96,14 @@ export class UsersController {
   @ApiResponse({ status: 500, description: 'Internal server error' })
   @ApiParam({ name: 'id', required: true, type: Number })
   @Get(':id')
+  @Roles(RoleName.ADMIN, RoleName.CUSTOMER, RoleName.CAROWNER)
+  @UseGuards(RolesGuard)
   getUserById(@Param('id') id: number): Promise<UserDto> {
-    return this.usersService.getUserById(id);
+    try {
+      return this.usersService.getUserById(id);
+    } catch (error) {
+      throw new Error(error.message);
+    }
   }
 
   @ApiOperation({ summary: 'Get user by username' })
@@ -114,6 +126,8 @@ export class UsersController {
   @ApiResponse({ status: 500, description: 'Internal server error' })
   @ApiParam({ name: 'username', required: true, type: String })
   @Get('/username/:username')
+  @Roles(RoleName.ADMIN, RoleName.CUSTOMER, RoleName.CAROWNER)
+  @UseGuards(RolesGuard)
   getUserByUsername(@Param('username') username: string): Promise<UserDto> {
     return this.usersService.getUserByUsername(username);
   }
@@ -134,6 +148,8 @@ export class UsersController {
   @ApiResponse({ status: 500, description: 'Internal server error' })
   @ApiBody({ type: CreateUserDto })
   @Post()
+  @Roles(RoleName.ADMIN)
+  @UseGuards(RolesGuard)
   createUser(@Body() createUserDto: CreateUserDto): Promise<UserDto> {
     return this.usersService.createUser(createUserDto);
   }
@@ -159,7 +175,9 @@ export class UsersController {
   @ApiResponse({ status: 500, description: 'Internal server error' })
   @ApiParam({ name: 'id', required: true, type: Number })
   @ApiBody({ type: UpdateUserDto })
-  @Put(':id')
+  @Patch(':id')
+  @Roles(RoleName.ADMIN, RoleName.CUSTOMER, RoleName.CAROWNER)
+  @UseGuards(RolesGuard)
   updateUser(
     @Param('id') id: number,
     @Body() updateUserDto: UpdateUserDto,
@@ -182,6 +200,8 @@ export class UsersController {
   @ApiResponse({ status: 500, description: 'Internal server error' })
   @ApiParam({ name: 'id', required: true, type: Number })
   @Delete(':id')
+  @Roles(RoleName.ADMIN)
+  @UseGuards(RolesGuard)
   deleteUser(@Param('id') id: number): Promise<UserDto> {
     return this.usersService.deleteUser(id);
   }

@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import {
   ApiExtraModels,
   ApiOperation,
@@ -8,7 +8,9 @@ import {
 } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
+import { Public } from './decorators';
 import { SignInDto, SignUpDto } from './dto';
+import { RolesGuard } from './guards';
 import { SignInSchema, SignUpSchema } from './schemas';
 
 @ApiTags('Auth')
@@ -33,6 +35,8 @@ export class AuthController {
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @ApiResponse({ status: 409, description: 'Username or email already exists' })
   @Post('signup')
+  @UseGuards(RolesGuard)
+  @Public()
   signUp(@Body() signUpDto: SignUpDto) {
     return this.authService.signUp(signUpDto);
   }
@@ -53,6 +57,8 @@ export class AuthController {
   @ApiResponse({ status: 400, description: 'Invalid credentials' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @Post('signin')
+  @UseGuards(RolesGuard)
+  @Public()
   signIn(@Body() signInDto: SignInDto): Promise<SignInSchema> {
     return this.authService.signIn(signInDto);
   }
