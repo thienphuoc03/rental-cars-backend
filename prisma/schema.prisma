@@ -43,7 +43,7 @@ model User {
 
 model CarBrand {
   id        Int        @id @default(autoincrement()) @map("ma_hang_xe")
-  name      String     @unique @map("ten_hang_xe") @db.VarChar(255)
+  name      String     @map("ten_hang_xe") @db.VarChar(255)
   createdAt DateTime   @default(now()) @map("ngay_tao")
   updatedAt DateTime   @updatedAt @map("ngay_cap_nhat")
   CarModel  CarModel[]
@@ -53,7 +53,7 @@ model CarBrand {
 
 model CarModel {
   id        Int       @id @default(autoincrement()) @map("ma_mau_xe")
-  name      String    @unique @map("ten_mau_xe") @db.VarChar(255)
+  name      String    @map("ten_mau_xe") @db.VarChar(255)
   brand     CarBrand? @relation(fields: [brandId], references: [id], onDelete: Cascade)
   brandId   Int?      @map("ma_hang_xe")
   createdAt DateTime  @default(now()) @map("ngay_tao")
@@ -84,28 +84,28 @@ model Car {
   Review            Review[]
   CarColor          CarColor?     @relation(fields: [carColorId], references: [id], onDelete: Cascade)
   carColorId        Int?          @map("ma_mau_sac_xe")
+  CarImage          CarImage[]
 
   @@map("xe")
 }
 
 model CarColor {
-  id        Int        @id @default(autoincrement()) @map("ma_mau_sac_xe")
-  name      String     @unique @map("ten_mau_sac_xe") @db.VarChar(255)
-  createdAt DateTime   @default(now()) @map("ngay_tao")
-  updatedAt DateTime   @updatedAt @map("ngay_cap_nhat")
+  id        Int      @id @default(autoincrement()) @map("ma_mau_sac_xe")
+  name      String   @unique @map("ten_mau_sac_xe") @db.VarChar(255)
+  createdAt DateTime @default(now()) @map("ngay_tao")
+  updatedAt DateTime @updatedAt @map("ngay_cap_nhat")
   Car       Car[]
-  CarImage  CarImage[]
 
   @@map("mau_sac_xe")
 }
 
 model CarImage {
-  id         Int       @id @default(autoincrement()) @map("ma_hinh_anh_xe")
-  url        String    @map("url") @db.LongText
-  carColor   CarColor? @relation(fields: [carColorId], references: [id], onDelete: Cascade)
-  carColorId Int?      @map("ma_mau_sac_xe")
-  createdAt  DateTime  @default(now()) @map("ngay_tao")
-  updatedAt  DateTime  @updatedAt @map("ngay_cap_nhat")
+  id        Int      @id @default(autoincrement()) @map("ma_hinh_anh_xe")
+  url       String   @map("url") @db.LongText
+  car       Car?     @relation(fields: [carId], references: [id], onDelete: Cascade)
+  carId     Int?     @map("ma_xe")
+  createdAt DateTime @default(now()) @map("ngay_tao")
+  updatedAt DateTime @updatedAt @map("ngay_cap_nhat")
 
   @@map("hinh_anh_xe")
 }
