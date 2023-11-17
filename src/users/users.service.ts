@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { RoleName } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
+import { UpdateRoleUserDto } from './dto';
 import { getPagination } from '../../utils/utils';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -227,5 +228,43 @@ export class UsersService {
     });
 
     return `User: ${user.name} has been deleted`;
+  }
+
+  async updateRoleUser(userId: number, body: UpdateRoleUserDto): Promise<any> {
+    const { role } = body;
+
+    const isRole = await this.prismaService.role.findFirst({
+      where: {
+        name: role as RoleName,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!isRole)
+      throw new NotFoundException(`Role with name ${role} not found`);
+
+    const user = await this.prismaService.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        roleId: Number(isRole?.id),
+      },
+      select: {
+        username: true,
+        name: true,
+        role: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+
+    const userResponse = { ...user, role: user.role.name };
+
+    return userResponse;
   }
 }

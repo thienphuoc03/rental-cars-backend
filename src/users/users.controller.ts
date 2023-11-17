@@ -24,7 +24,7 @@ import { RoleName } from '@prisma/client';
 import { Roles } from 'src/auth/decorators';
 import { RolesGuard } from 'src/auth/guards';
 
-import { CreateUserDto, UserDto } from './dto';
+import { CreateUserDto, UpdateRoleUserDto, UserDto } from './dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 import { MetaSchema } from '../../schemas';
@@ -204,5 +204,34 @@ export class UsersController {
   @UseGuards(RolesGuard)
   deleteUser(@Param('id') id: number): Promise<UserDto> {
     return this.usersService.deleteUser(id);
+  }
+
+  // update role user by user id
+  @ApiOperation({ summary: 'Update role user by user id' })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully',
+  })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @ApiResponse({
+    status: 404,
+    description: 'Role with name ${role} not found',
+  })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiParam({ name: 'userId', required: true, type: Number })
+  @ApiBody({ type: UpdateRoleUserDto })
+  @Patch('/role/:userId')
+  @Roles(RoleName.ADMIN)
+  @UseGuards(RolesGuard)
+  updateRoleUser(
+    @Param('userId') userId: number,
+    @Body() updateRoleUserDto: UpdateRoleUserDto,
+  ): Promise<any> {
+    try {
+      return this.usersService.updateRoleUser(userId, updateRoleUserDto);
+    } catch (error) {
+      throw new Error(error.message);
+    }
   }
 }
