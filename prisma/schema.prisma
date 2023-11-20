@@ -12,7 +12,7 @@ datasource db {
 
 model Role {
   id        Int      @id @default(autoincrement()) @map("ma_vai_tro")
-  name      RoleName @default(CUSTOMER) @map("ten_vai_tro")
+  name      RoleName @default(TRAVELER) @map("ten_vai_tro")
   createdAt DateTime @default(now()) @map("ngay_tao")
   updatedAt DateTime @updatedAt @map("ngay_cap_nhat")
   User      User[]
@@ -180,7 +180,7 @@ model Review {
 enum RoleName {
   ADMIN    @map("QUAN_TRI_VIEN")
   CAROWNER @map("CHU_XE")
-  CUSTOMER @map("NGUOI_THUE_XE")
+  TRAVELER @map("NGUOI_THUE_XE")
 }
 
 enum UserStatus {

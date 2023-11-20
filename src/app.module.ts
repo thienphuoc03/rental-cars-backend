@@ -8,6 +8,7 @@ import { JwtStrategy } from './auth/strategies';
 import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/users.module';
 import { CarBrandsModule } from './car-brands/car-brands.module';
+import { CarModelsModule } from './car-models/car-models.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { CarBrandsModule } from './car-brands/car-brands.module';
     AuthModule,
     UsersModule,
     CarBrandsModule,
+    CarModelsModule,
   ],
   controllers: [],
   providers: [
