@@ -7,6 +7,7 @@ import { AtGuard } from './auth/guards';
 import { JwtStrategy } from './auth/strategies';
 import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/users.module';
+import { CarBrandsModule } from './car-brands/car-brands.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { UsersModule } from './users/users.module';
     PrismaModule,
     AuthModule,
     UsersModule,
+    CarBrandsModule,
   ],
   controllers: [],
   providers: [
