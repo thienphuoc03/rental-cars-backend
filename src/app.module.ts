@@ -11,6 +11,7 @@ import { CarBrandsModule } from './car-brands/car-brands.module';
 import { CarModelsModule } from './car-models/car-models.module';
 import { RolesModule } from './roles/roles.module';
 import { CarColorsModule } from './car-colors/car-colors.module';
+import { FeaturesModule } from './features/features.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { CarColorsModule } from './car-colors/car-colors.module';
     CarModelsModule,
     RolesModule,
     CarColorsModule,
+    FeaturesModule,
   ],
   controllers: [],
   providers: [
