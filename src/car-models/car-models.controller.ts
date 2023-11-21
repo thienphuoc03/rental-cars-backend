@@ -14,6 +14,7 @@ import {
   ApiBody,
   ApiExtraModels,
   ApiOperation,
+  ApiQuery,
   ApiResponse,
   ApiTags,
   getSchemaPath,
@@ -90,6 +91,8 @@ export class CarModelsController {
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'limit', required: false })
   @UseGuards(RolesGuard)
   @Public()
   @Get()
