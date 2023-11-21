@@ -9,6 +9,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/users.module';
 import { CarBrandsModule } from './car-brands/car-brands.module';
 import { CarModelsModule } from './car-models/car-models.module';
+import { RolesModule } from './roles/roles.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { CarModelsModule } from './car-models/car-models.module';
     UsersModule,
     CarBrandsModule,
     CarModelsModule,
+    RolesModule,
   ],
   controllers: [],
   providers: [
