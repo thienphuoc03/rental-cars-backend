@@ -130,7 +130,7 @@ export class UsersService {
   async createUser(data: any): Promise<any> {
     const roleId = await this.prismaService.role.findFirst({
       where: {
-        name: (data.role as RoleName) || RoleName.CUSTOMER,
+        name: (data.role as RoleName) || RoleName.TRAVELER,
       },
       select: {
         id: true,

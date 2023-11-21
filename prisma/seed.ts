@@ -11,7 +11,7 @@ async function main() {
         name: RoleName.CAROWNER,
       },
       {
-        name: RoleName.CUSTOMER,
+        name: RoleName.TRAVELER,
       },
     ],
   });
@@ -29,9 +29,9 @@ async function main() {
     },
   });
 
-  const getRoleCustomerId = await prisma.role.findFirst({
+  const getRoleTRAVELERId = await prisma.role.findFirst({
     where: {
-      name: RoleName.CUSTOMER,
+      name: RoleName.TRAVELER,
     },
   });
 
@@ -69,7 +69,7 @@ async function main() {
         gender: Gender.OTHER,
         address: '',
         avatarUrl: '',
-        roleId: getRoleCustomerId?.id,
+        roleId: getRoleTRAVELERId?.id,
       },
     ],
   });

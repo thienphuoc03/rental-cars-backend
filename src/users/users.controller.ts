@@ -96,7 +96,7 @@ export class UsersController {
   @ApiResponse({ status: 500, description: 'Internal server error' })
   @ApiParam({ name: 'id', required: true, type: Number })
   @Get(':id')
-  @Roles(RoleName.ADMIN, RoleName.CUSTOMER, RoleName.CAROWNER)
+  @Roles(RoleName.ADMIN, RoleName.TRAVELER, RoleName.CAROWNER)
   @UseGuards(RolesGuard)
   getUserById(@Param('id') id: number): Promise<UserDto> {
     try {
@@ -126,7 +126,7 @@ export class UsersController {
   @ApiResponse({ status: 500, description: 'Internal server error' })
   @ApiParam({ name: 'username', required: true, type: String })
   @Get('/username/:username')
-  @Roles(RoleName.ADMIN, RoleName.CUSTOMER, RoleName.CAROWNER)
+  @Roles(RoleName.ADMIN, RoleName.TRAVELER, RoleName.CAROWNER)
   @UseGuards(RolesGuard)
   getUserByUsername(@Param('username') username: string): Promise<UserDto> {
     return this.usersService.getUserByUsername(username);
@@ -176,7 +176,7 @@ export class UsersController {
   @ApiParam({ name: 'id', required: true, type: Number })
   @ApiBody({ type: UpdateUserDto })
   @Patch(':id')
-  @Roles(RoleName.ADMIN, RoleName.CUSTOMER, RoleName.CAROWNER)
+  @Roles(RoleName.ADMIN, RoleName.TRAVELER, RoleName.CAROWNER)
   @UseGuards(RolesGuard)
   updateUser(
     @Param('id') id: number,

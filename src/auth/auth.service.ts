@@ -39,10 +39,10 @@ export class AuthService {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Find the default role with the name 'CUSTOMER'
+    // Find the default role with the name 'TRAVELER'
     const defaultRole = await this.prismaService.role.findFirst({
       where: {
-        name: RoleName.CUSTOMER,
+        name: RoleName.TRAVELER,
       },
     });
 
