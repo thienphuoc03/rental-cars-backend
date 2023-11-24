@@ -1,21 +1,22 @@
 import { ClassSerializerInterceptor, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { JwtAuthGuard } from 'src/auth/guards';
 
 import { AuthModule } from './auth/auth.module';
-import { AtGuard } from './auth/guards';
 import { JwtStrategy } from './auth/strategies';
-import { PrismaModule } from './prisma/prisma.module';
-import { UsersModule } from './users/users.module';
 import { CarBrandsModule } from './car-brands/car-brands.module';
-import { CarModelsModule } from './car-models/car-models.module';
-import { RolesModule } from './roles/roles.module';
 import { CarColorsModule } from './car-colors/car-colors.module';
+import { CarModelsModule } from './car-models/car-models.module';
+import { CarsModule } from './cars/cars.module';
 import { FeaturesModule } from './features/features.module';
+import { PrismaModule } from './prisma/prisma.module';
+import { RolesModule } from './roles/roles.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ envFilePath: ['.env'] }),
+    ConfigModule.forRoot({ envFilePath: ['.env.local'] }),
     PrismaModule,
     AuthModule,
     UsersModule,
@@ -24,12 +25,13 @@ import { FeaturesModule } from './features/features.module';
     RolesModule,
     CarColorsModule,
     FeaturesModule,
+    CarsModule,
   ],
   controllers: [],
   providers: [
     {
       provide: APP_GUARD,
-      useClass: AtGuard,
+      useClass: JwtAuthGuard,
     },
     {
       provide: 'APP_STRATEGY',

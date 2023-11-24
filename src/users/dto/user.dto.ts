@@ -38,6 +38,13 @@ export class UserDto {
   gender: string;
 
   @ApiProperty({
+    example: '1999-08-20',
+    type: Date,
+  })
+  @IsString()
+  dateOfBirth: Date;
+
+  @ApiProperty({
     example: 'Ha Noi',
     type: String,
   })
