@@ -5,7 +5,7 @@ module.exports = {
     tsconfigRootDir: __dirname,
     sourceType: 'module',
   },
-  plugins: ['@typescript-eslint/eslint-plugin', , 'import', 'unused-imports'],
+  plugins: ['@typescript-eslint/eslint-plugin', 'import', 'unused-imports'],
   extends: [
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
@@ -39,8 +39,8 @@ module.exports = {
     ],
 
     // remove unused imports
-    'no-unused-vars': 'off',
-    'unused-imports/no-unused-imports': 'error',
+    'no-unused-vars': 'warn',
+    'unused-imports/no-unused-imports': 'warn',
     'unused-imports/no-unused-vars': [
       'warn',
       {
