@@ -64,7 +64,7 @@ export class UsersService {
   }
 
   async getUserById(id: number): Promise<any> {
-    const user = await this.prismaService.user.findUnique({
+    const user = await this.prismaService.user.findFirst({
       where: {
         id: Number(id),
       },
@@ -128,6 +128,10 @@ export class UsersService {
     const userResponse = { ...user, role: user.role.name };
 
     return userResponse;
+  }
+
+  async getProfile(currentUser: any): Promise<any> {
+    return currentUser;
   }
 
   async createUser(data: any): Promise<any> {

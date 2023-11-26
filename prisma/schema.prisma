@@ -21,22 +21,24 @@ model Role {
 }
 
 model User {
-  id        Int        @id @default(autoincrement()) @map("ma_nguoi_dung")
-  username  String     @unique @map("ten_dang_nhap") @db.VarChar(100)
-  password  String     @map("mat_khau") @db.VarChar(100)
-  name      String?    @map("ten_nguoi_dung") @db.VarChar(255)
-  email     String?    @unique @map("email") @db.VarChar(100)
-  phone     String?    @unique @map("so_dien_thoai") @db.VarChar(11)
-  gender    Gender?    @default(OTHER) @map("gioi_tinh")
-  address   String?    @map("dia_chi")
-  avatarUrl String?    @map("avatar_url") @db.LongText
-  role      Role?      @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  roleId    Int?       @map("ma_vai_tro")
-  createdAt DateTime   @default(now()) @map("ngay_tao")
-  updatedAt DateTime   @updatedAt @map("ngay_cap_nhat")
-  status    UserStatus @default(ACTIVE) @map("trang_thai")
-  Order     Order[]
-  Review    Review[]
+  id          Int        @id @default(autoincrement()) @map("ma_nguoi_dung")
+  username    String     @unique @map("ten_dang_nhap") @db.VarChar(100)
+  password    String     @map("mat_khau") @db.VarChar(100)
+  name        String?    @map("ten_nguoi_dung") @db.VarChar(255)
+  email       String?    @unique @map("email") @db.VarChar(100)
+  phone       String?    @unique @map("so_dien_thoai") @db.VarChar(11)
+  gender      Gender?    @default(OTHER) @map("gioi_tinh")
+  dateOfBirth DateTime?  @map("ngay_sinh")
+  address     String?    @map("dia_chi")
+  avatarUrl   String?    @map("avatar_url") @db.LongText
+  role        Role?      @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  roleId      Int?       @map("ma_vai_tro")
+  createdAt   DateTime   @default(now()) @map("ngay_tao")
+  updatedAt   DateTime   @updatedAt @map("ngay_cap_nhat")
+  status      UserStatus @default(ACTIVE) @map("trang_thai")
+  Order       Order[]
+  Review      Review[]
+  Car         Car[]
 
   @@map("nguoi_dung")
 }
@@ -68,7 +70,7 @@ model Car {
   name              String        @map("ten_xe") @db.VarChar(255)
   slug              String        @unique @map("slug") @db.VarChar(255)
   licensePlates     String        @unique @map("bien_so_xe") @db.VarChar(10)
-  seat              Int           @map("so_cho")
+  seats             Int           @map("so_cho")
   yearOfManufacture Int           @map("nam_san_xuat")
   transmission      Transmission  @default(AUTOMATIC_TRANSMISSION) @map("loai_hop_so")
   fuel              Fuel          @default(GASOLINE) @map("nhien_lieu")
@@ -85,15 +87,17 @@ model Car {
   CarColor          CarColor?     @relation(fields: [carColorId], references: [id], onDelete: Cascade)
   carColorId        Int?          @map("ma_mau_sac_xe")
   CarImage          CarImage[]
+  user              User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            Int?          @map("ma_nguoi_dung")
 
   @@map("xe")
 }
 
 model CarColor {
-  id        Int      @id @default(autoincrement()) @map("ma_mau_sac_xe")
-  name      String   @unique @map("ten_mau_sac_xe") @db.VarChar(255)
-  createdAt DateTime @default(now()) @map("ngay_tao")
-  updatedAt DateTime @updatedAt @map("ngay_cap_nhat")
+  id        Int          @id @default(autoincrement()) @map("ma_mau_sac_xe")
+  name      CarColorName @unique @map("ten_mau_sac_xe")
+  createdAt DateTime     @default(now()) @map("ngay_tao")
+  updatedAt DateTime     @updatedAt @map("ngay_cap_nhat")
   Car       Car[]
 
   @@map("mau_sac_xe")
@@ -198,6 +202,22 @@ enum CarStatus {
   AVAILABLE   @map("san_sang")
   RENTED      @map("da_thue")
   UNAVAILABLE @map("khong_san_sang")
+}
+
+enum CarColorName {
+  BLACK     @map("den")
+  WHITE     @map("trang")
+  RED       @map("do")
+  BLUE      @map("xanh_duong")
+  YELLOW    @map("vang")
+  ORANGE    @map("cam")
+  GREEN     @map("xanh_la")
+  PURPLE    @map("tim")
+  PINK      @map("hong")
+  BROWN     @map("nau")
+  GREY      @map("xam")
+  SILVER    @map("bac")
+  CHAMPAGNE @map("vang_nhat")
 }
 
 enum Transmission {

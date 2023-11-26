@@ -21,13 +21,17 @@ import {
   getSchemaPath,
 } from '@nestjs/swagger';
 import { RoleName } from '@prisma/client';
-import { Roles } from 'src/auth/decorators';
+import { MetaSchema } from 'schemas';
+import { GetCurrentUser, Roles } from 'src/auth/decorators';
 import { RolesGuard } from 'src/auth/guards';
 
-import { CreateUserDto, UpdateRoleUserDto, UserDto } from './dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import {
+  CreateUserDto,
+  UpdateRoleUserDto,
+  UpdateUserDto,
+  UserDto,
+} from './dto';
 import { UsersService } from './users.service';
-import { MetaSchema } from '../../schemas';
 
 @ApiBearerAuth()
 @ApiTags('Users')
@@ -130,6 +134,32 @@ export class UsersController {
   @UseGuards(RolesGuard)
   getUserByUsername(@Param('username') username: string): Promise<UserDto> {
     return this.usersService.getUserByUsername(username);
+  }
+
+  @ApiOperation({ summary: 'Get profile' })
+  @ApiExtraModels(UserDto)
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully',
+    content: {
+      'application/json': {
+        schema: { $ref: getSchemaPath(UserDto) },
+      },
+    },
+  })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @UseGuards(RolesGuard)
+  @Roles(RoleName.ADMIN, RoleName.CAROWNER, RoleName.TRAVELER)
+  @Get('/profile')
+  getProfile(@GetCurrentUser() currentUser: any): Promise<any> {
+    try {
+      return this.usersService.getProfile(currentUser);
+    } catch (error) {
+      throw new Error(error.message);
+    }
   }
 
   @ApiOperation({ summary: 'Add new user' })

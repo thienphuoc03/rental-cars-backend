@@ -7,10 +7,15 @@ import { AuthModule } from './auth/auth.module';
 import { JwtStrategy } from './auth/strategies';
 import { CarBrandsModule } from './car-brands/car-brands.module';
 import { CarColorsModule } from './car-colors/car-colors.module';
+import { CarFeaturesModule } from './car-features/car-features.module';
+import { CarImagesModule } from './car-images/car-images.module';
 import { CarModelsModule } from './car-models/car-models.module';
 import { CarsModule } from './cars/cars.module';
 import { FeaturesModule } from './features/features.module';
+import { OrderDetailModule } from './order-detail/order-detail.module';
+import { OrdersModule } from './orders/orders.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { ReviewsModule } from './reviews/reviews.module';
 import { RolesModule } from './roles/roles.module';
 import { UsersModule } from './users/users.module';
 
@@ -26,6 +31,11 @@ import { UsersModule } from './users/users.module';
     CarColorsModule,
     FeaturesModule,
     CarsModule,
+    CarImagesModule,
+    OrdersModule,
+    OrderDetailModule,
+    CarFeaturesModule,
+    ReviewsModule,
   ],
   controllers: [],
   providers: [

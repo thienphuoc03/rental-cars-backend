@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { CarColorName } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { getPagination } from 'utils/utils';
 
@@ -15,7 +16,7 @@ export class CarColorsService {
 
     const carColor = await this.prismaService.carColor.create({
       data: {
-        name,
+        name: name as CarColorName,
       },
     });
 
@@ -75,7 +76,7 @@ export class CarColorsService {
         id,
       },
       data: {
-        name,
+        name: name as CarColorName,
       },
     });
 

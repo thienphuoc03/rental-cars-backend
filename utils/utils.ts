@@ -7,4 +7,13 @@ const getPagination = (page: number, limit: number) => {
   return { _page, _limit };
 };
 
-export { getPagination };
+const generateSlug = (name: string): string => {
+  const ran = Math.floor(Math.random() * 1000000).toString();
+
+  return `${name
+    .toLowerCase()
+    .replace(/ /g, '-')
+    .replace(/[^\w-]+/g, '')}-${ran}`;
+};
+
+export { getPagination, generateSlug };

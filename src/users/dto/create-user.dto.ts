@@ -39,7 +39,6 @@ export class CreateUserDto {
     type: String,
   })
   @IsString()
-  @IsNotEmpty()
   phone: string;
 
   @ApiProperty({
@@ -47,15 +46,20 @@ export class CreateUserDto {
     type: String,
   })
   @IsString()
-  @IsNotEmpty()
   gender: string;
+
+  @ApiProperty({
+    example: '1999-08-20',
+    type: Date,
+  })
+  @IsString()
+  dateOfBirth: Date;
 
   @ApiProperty({
     example: 'Da Nang City',
     type: String,
   })
   @IsString()
-  @IsNotEmpty()
   address: string;
 
   @ApiProperty({
