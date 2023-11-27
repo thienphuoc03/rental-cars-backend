@@ -52,6 +52,8 @@ export class AuthService {
       data: {
         username,
         email,
+        avatarUrl:
+          'https://res.cloudinary.com/dj1v6wmjv/image/upload/v1700748175/rental-cars-cloudinary/sua7izt00p9yxf42b3k4.jpg',
         password: hashedPassword,
         roleId: Number(defaultRole.id),
       },
