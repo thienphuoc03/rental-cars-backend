@@ -7,11 +7,15 @@ import {
   Patch,
   Post,
   Query,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
   ApiBody,
+  ApiConsumes,
   ApiExtraModels,
   ApiOperation,
   ApiParam,
@@ -24,20 +28,20 @@ import { RoleName } from '@prisma/client';
 import { MetaSchema } from 'schemas';
 import { GetCurrentUser, Roles } from 'src/auth/decorators';
 import { RolesGuard } from 'src/auth/guards';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { UploadAvatarDto } from 'src/users/dto/upload-avatar.dto';
 
-import {
-  CreateUserDto,
-  UpdateRoleUserDto,
-  UpdateUserDto,
-  UserDto,
-} from './dto';
+import { CreateUserDto, UpdateRoleUserDto, UpdateUserDto, UserDto } from './dto';
 import { UsersService } from './users.service';
 
 @ApiBearerAuth()
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly cloudinaryService: CloudinaryService,
+  ) {}
 
   @ApiOperation({ summary: 'Get all user' })
   @ApiExtraModels(UserDto, MetaSchema)
@@ -76,10 +80,7 @@ export class UsersController {
   @Get()
   @Roles(RoleName.ADMIN)
   @UseGuards(RolesGuard)
-  getAllUsers(
-    @Query('page') page: number,
-    @Query('limit') limit: number,
-  ): Promise<any> {
+  getAllUsers(@Query('page') page: number, @Query('limit') limit: number): Promise<any> {
     return this.usersService.getAllUsers(page, limit);
   }
 
@@ -208,10 +209,7 @@ export class UsersController {
   @Patch(':id')
   @Roles(RoleName.ADMIN, RoleName.TRAVELER, RoleName.CAROWNER)
   @UseGuards(RolesGuard)
-  updateUser(
-    @Param('id') id: number,
-    @Body() updateUserDto: UpdateUserDto,
-  ): Promise<UserDto> {
+  updateUser(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto): Promise<UserDto> {
     return this.usersService.updateUser(id, updateUserDto);
   }
 
@@ -254,12 +252,46 @@ export class UsersController {
   @Patch('/role/:userId')
   @Roles(RoleName.ADMIN)
   @UseGuards(RolesGuard)
-  updateRoleUser(
-    @Param('userId') userId: number,
-    @Body() updateRoleUserDto: UpdateRoleUserDto,
-  ): Promise<any> {
+  updateRoleUser(@Param('userId') userId: number, @Body() updateRoleUserDto: UpdateRoleUserDto): Promise<any> {
     try {
       return this.usersService.updateRoleUser(userId, updateRoleUserDto);
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  }
+
+  @ApiOperation({ summary: 'Upload avatar' })
+  @ApiExtraModels(UserDto)
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully',
+    content: {
+      'application/json': {
+        schema: { $ref: getSchemaPath(UserDto) },
+      },
+    },
+  })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'List of cats',
+    type: UploadAvatarDto,
+  })
+  @Roles(RoleName.ADMIN, RoleName.CAROWNER, RoleName.TRAVELER)
+  @UseGuards(RolesGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  @Patch('avatar/upload')
+  async uploadAvatar(@GetCurrentUser() currentUser: any, @UploadedFile() file: Express.Multer.File): Promise<any> {
+    try {
+      const nameImage = `${currentUser.username}_${Date.now()}_avatar`;
+
+      if (!file) throw new Error('File not found');
+      const image = await this.cloudinaryService.uploadAvatar(file, nameImage);
+
+      return this.usersService.uploadAvatar(currentUser, image);
     } catch (error) {
       throw new Error(error.message);
     }

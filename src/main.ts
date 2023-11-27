@@ -34,17 +34,7 @@ async function bootstrap() {
     .setTitle('Rental Cars APIs')
     .setDescription('APIs for Rental Cars project with NestJS.')
     .setVersion('1.0')
-    .addBasicAuth(
-      {
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-        name: 'JWT',
-        description: 'Enter JWT token',
-        in: 'header',
-      },
-      'JWT-auth',
-    )
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/v1/docs', app, document);
@@ -55,4 +45,5 @@ async function bootstrap() {
     );
   });
 }
+
 bootstrap();

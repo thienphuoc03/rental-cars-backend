@@ -122,8 +122,7 @@ export class UsersService {
       },
     });
 
-    if (!user)
-      throw new NotFoundException(`User with username ${username} not found`);
+    if (!user) throw new NotFoundException(`User with username ${username} not found`);
 
     const userResponse = { ...user, role: user.role.name };
 
@@ -251,8 +250,7 @@ export class UsersService {
       },
     });
 
-    if (!isRole)
-      throw new NotFoundException(`Role with name ${role} not found`);
+    if (!isRole) throw new NotFoundException(`Role with name ${role} not found`);
 
     const user = await this.prismaService.user.update({
       where: {
@@ -271,6 +269,45 @@ export class UsersService {
         },
       },
     });
+
+    const userResponse = { ...user, role: user.role.name };
+
+    return userResponse;
+  }
+
+  async uploadAvatar(currentUser: any, image: any): Promise<any> {
+    const { id } = currentUser;
+    const { url } = image;
+
+    const user = await this.prismaService.user.update({
+      where: {
+        id: Number(id),
+      },
+      data: {
+        avatarUrl: url,
+      },
+      select: {
+        id: true,
+        name: true,
+        username: true,
+        email: true,
+        phone: true,
+        gender: true,
+        dateOfBirth: true,
+        address: true,
+        avatarUrl: true,
+        status: true,
+        role: {
+          select: {
+            name: true,
+          },
+        },
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    if (!user) throw new NotFoundException(`User with id ${id} not found`);
 
     const userResponse = { ...user, role: user.role.name };
 

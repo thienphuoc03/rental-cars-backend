@@ -11,6 +11,7 @@ import { CarFeaturesModule } from './car-features/car-features.module';
 import { CarImagesModule } from './car-images/car-images.module';
 import { CarModelsModule } from './car-models/car-models.module';
 import { CarsModule } from './cars/cars.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { FeaturesModule } from './features/features.module';
 import { OrderDetailModule } from './order-detail/order-detail.module';
 import { OrdersModule } from './orders/orders.module';
@@ -36,6 +37,7 @@ import { UsersModule } from './users/users.module';
     OrderDetailModule,
     CarFeaturesModule,
     ReviewsModule,
+    CloudinaryModule,
   ],
   controllers: [],
   providers: [
