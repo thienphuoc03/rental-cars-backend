@@ -111,10 +111,7 @@ export class CarModelsService {
     return carModelResponse;
   }
 
-  async updateById(
-    id: number,
-    updateCarModelDto: UpdateCarModelDto,
-  ): Promise<any> {
+  async updateById(id: number, updateCarModelDto: UpdateCarModelDto): Promise<any> {
     const { name, brandId } = updateCarModelDto;
     const carModel = await this.prismaService.carModel.update({
       where: {

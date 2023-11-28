@@ -1,24 +1,17 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiBody,
   ApiExtraModels,
   ApiOperation,
+  ApiParam,
+  ApiQuery,
   ApiResponse,
   ApiTags,
   getSchemaPath,
 } from '@nestjs/swagger';
 import { RoleName } from '@prisma/client';
-import { GetCurrentUser, Roles } from 'src/auth/decorators';
+import { GetCurrentUser, Public, Roles } from 'src/auth/decorators';
 import { RolesGuard } from 'src/auth/guards';
 import { CarDto, CreateCarDto, UpdateCarDto } from 'src/cars/dto';
 
@@ -49,10 +42,7 @@ export class CarsController {
   @UseGuards(RolesGuard)
   @Roles(RoleName.ADMIN, RoleName.CAROWNER)
   @Post()
-  createCar(
-    @GetCurrentUser() currentUser: any,
-    @Body() createCarDto: CreateCarDto,
-  ): Promise<any> {
+  createCar(@GetCurrentUser() currentUser: any, @Body() createCarDto: CreateCarDto): Promise<any> {
     try {
       return this.carsService.createCar(createCarDto, currentUser);
     } catch (e) {
@@ -60,45 +50,109 @@ export class CarsController {
     }
   }
 
+  @ApiOperation({ summary: 'Get all cars' })
+  @ApiExtraModels(CarDto)
+  @ApiResponse({
+    status: 200,
+    description: 'Get all cars successfully.',
+    content: {
+      'application/json': {
+        schema: { $ref: getSchemaPath(CarDto) },
+      },
+    },
+  })
+  @ApiResponse({ status: 400, description: 'Bad request.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @ApiResponse({ status: 500, description: 'Internal server error.' })
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 1 })
+  @UseGuards(RolesGuard)
+  @Public()
   @Get()
-  findAll(): Promise<any> {
+  findAllCar(@Query('page') page: number, @Query('limit') limit: number): Promise<any> {
     try {
-      return this.carsService.findAll();
+      return this.carsService.findAllCar(page, limit);
     } catch (e) {
       throw new Error(e);
     }
   }
 
+  @ApiOperation({ summary: 'Get a car by id' })
+  @ApiExtraModels(CarDto)
+  @ApiResponse({
+    status: 200,
+    description: 'Get a car by id successfully.',
+    content: {
+      'application/json': {
+        schema: { $ref: getSchemaPath(CarDto) },
+      },
+    },
+  })
+  @ApiResponse({ status: 400, description: 'Bad request.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @ApiResponse({ status: 404, description: 'Car not found.' })
+  @ApiResponse({ status: 500, description: 'Internal server error.' })
+  @ApiParam({ name: 'id', required: true, type: Number, example: 1 })
+  @UseGuards(RolesGuard)
+  @Public()
+  @Get(':id')
+  findOneById(@Param('id') id: number): Promise<any> {
+    try {
+      return this.carsService.findOneById(+id);
+    } catch (e) {
+      throw new Error(e);
+    }
+  }
+
+  @ApiOperation({ summary: 'Update a car by id' })
+  @ApiExtraModels(CarDto)
+  @ApiResponse({
+    status: 200,
+    description: 'Update a car by id successfully.',
+    content: {
+      'application/json': {
+        schema: { $ref: getSchemaPath(CarDto) },
+      },
+    },
+  })
+  @ApiResponse({ status: 400, description: 'Bad request.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @ApiResponse({ status: 404, description: 'Car not found.' })
+  @ApiResponse({ status: 500, description: 'Internal server error.' })
+  @ApiParam({ name: 'id', required: true, type: Number, example: 1 })
+  @ApiBody({ type: UpdateCarDto })
   @UseGuards(RolesGuard)
   @Roles(RoleName.ADMIN, RoleName.CAROWNER)
-  @Get(':id')
-  findOneById(
-    @GetCurrentUser() currentUser: any,
-    @Param('id') id: number,
-  ): Promise<any> {
-    try {
-      return this.carsService.findOne(+id);
-    } catch (e) {
-      throw new Error(e);
-    }
-  }
-
   @Patch(':id')
-  update(
-    @Param('id') id: number,
-    @Body() updateCarDto: UpdateCarDto,
-  ): Promise<any> {
+  updateCarById(@Param('id') id: number, @Body() updateCarDto: UpdateCarDto): Promise<any> {
     try {
-      return this.carsService.update(+id, updateCarDto);
+      return this.carsService.updateCarById(+id, updateCarDto);
     } catch (e) {
       throw new Error(e);
     }
   }
 
+  @ApiOperation({ summary: 'Delete a car by id' })
+  @ApiExtraModels(CarDto)
+  @ApiResponse({
+    status: 200,
+    description: 'Delete a car by id successfully.',
+  })
+  @ApiResponse({ status: 400, description: 'Bad request.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @ApiResponse({ status: 404, description: 'Car not found.' })
+  @ApiResponse({ status: 500, description: 'Internal server error.' })
+  @ApiParam({ name: 'id', required: true, type: Number, example: 1 })
+  @UseGuards(RolesGuard)
+  @Roles(RoleName.ADMIN, RoleName.CAROWNER)
   @Delete(':id')
-  remove(@Param('id') id: number): Promise<any> {
+  removeById(@Param('id') id: number): Promise<any> {
     try {
-      return this.carsService.remove(+id);
+      return this.carsService.removeById(+id);
     } catch (e) {
       throw new Error(e);
     }

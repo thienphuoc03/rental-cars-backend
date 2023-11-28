@@ -76,6 +76,15 @@ export class CreateCarDto {
   pricePerDay: number;
 
   @ApiProperty({
+    example: '...',
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @IsNotEmpty()
+  address: string;
+
+  @ApiProperty({
     example: 'AVAILABLE',
     required: true,
     type: String,

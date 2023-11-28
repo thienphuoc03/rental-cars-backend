@@ -62,6 +62,12 @@ export class CarDto {
   pricePerDay: number;
 
   @ApiProperty({
+    example: 'Da Nang',
+    type: String,
+  })
+  address: string;
+
+  @ApiProperty({
     example: 'AVAILABLE',
     type: String,
   })

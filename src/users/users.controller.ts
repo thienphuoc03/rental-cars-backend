@@ -286,7 +286,7 @@ export class UsersController {
   @Patch('avatar/upload')
   async uploadAvatar(@GetCurrentUser() currentUser: any, @UploadedFile() file: Express.Multer.File): Promise<any> {
     try {
-      const nameImage = `${currentUser.username}_${Date.now()}_avatar`;
+      const nameImage = `${currentUser.username}-${Date.now()}-avatar`;
 
       if (!file) throw new Error('File not found');
       const image = await this.cloudinaryService.uploadAvatar(file, nameImage);
