@@ -158,6 +158,7 @@ model OrderDetail {
   orderId     Int?        @map("ma_don_hang")
   car         Car?        @relation(fields: [carId], references: [id], onDelete: Cascade)
   carId       Int?        @map("ma_xe")
+  pricePerDay Decimal     @map("gia_thue_theo_ngay") @db.Decimal(10, 2)
   startDate   DateTime    @map("ngay_bat_dau")
   endDate     DateTime    @map("ngay_ket_thuc")
   totalAmount Decimal     @map("tong_tien") @db.Decimal(10, 2)
