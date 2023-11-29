@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CarStatus, Fuel, Transmission } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { generateSlug, getPagination } from 'utils/utils';
+import { formatDecimalToNumber, generateSlug, getPagination } from 'utils/utils';
 
 import { CreateCarDto, UpdateCarDto } from './dto';
 
@@ -277,5 +277,264 @@ export class CarsService {
     }
 
     return `Delete a car by id: ${id} successfully.`;
+  }
+
+  async getNewestCar(): Promise<any> {
+    const newestCar = await this.prismaService.car.findMany({
+      where: {
+        status: CarStatus.AVAILABLE,
+      },
+      take: 8,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        transmission: true,
+        pricePerDay: true,
+        address: true,
+        status: true,
+        CarImage: {
+          select: {
+            url: true,
+          },
+        },
+        OrderDetail: {
+          select: {
+            id: true,
+          },
+          where: {
+            status: 'COMPLETED',
+          },
+        },
+        Review: {
+          select: {
+            id: true,
+            rating: true,
+          },
+        },
+      },
+    });
+
+    return newestCar.map((car) => ({
+      ...car,
+      pricePerDay: formatDecimalToNumber(car.pricePerDay),
+      thumbnail: car.CarImage[0].url,
+      trips: car.OrderDetail.length,
+      rating: car.Review.length > 0 ? car.Review.reduce((a, b) => a + b.rating, 0) / car.Review.length : 0,
+      address: car.address.split(',')[0],
+      OrderDetail: undefined,
+      Review: undefined,
+    }));
+  }
+
+  async getCarBySlug(slug: string): Promise<any> {
+    const car = await this.prismaService.car.findUnique({
+      where: {
+        slug,
+      },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        seats: true,
+        transmission: true,
+        fuel: true,
+        description: true,
+        pricePerDay: true,
+        address: true,
+        status: true,
+        CarImage: {
+          select: {
+            url: true,
+          },
+        },
+        CarFeature: {
+          select: {
+            feature: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+        OrderDetail: {
+          select: {
+            id: true,
+          },
+          where: {
+            status: 'COMPLETED',
+          },
+        },
+        Review: {
+          select: {
+            id: true,
+            content: true,
+            rating: true,
+            customer: {
+              select: {
+                id: true,
+                name: true,
+                avatarUrl: true,
+              },
+            },
+            createdAt: true,
+          },
+        },
+        user: {
+          select: {
+            id: true,
+            name: true,
+            avatarUrl: true,
+          },
+        },
+      },
+    });
+
+    if (!car) {
+      throw new NotFoundException(`Car with slug ${slug} not found`);
+    }
+
+    return {
+      ...car,
+      pricePerDay: formatDecimalToNumber(car.pricePerDay),
+      images: car.CarImage.map((image) => image.url),
+      CarFeature: car.CarFeature.map((feature) => feature.feature.name),
+      trips: car.OrderDetail.length,
+      rating: car.Review.length > 0 ? car.Review.reduce((a, b) => a + b.rating, 0) / car.Review.length : 0,
+      owner: car.user,
+      reviews: {
+        meta: {
+          totalReviews: car.Review.length,
+          average: car.Review.length > 0 ? car.Review.reduce((a, b) => a + b.rating, 0) / car.Review.length : 0,
+        },
+        data: car.Review.map((review) => ({
+          ...review,
+          createdAt: review.createdAt.toISOString(),
+        })),
+      },
+      CarImage: undefined,
+      OrderDetail: undefined,
+      user: undefined,
+      Review: undefined,
+    };
+  }
+
+  async searchCars(page: number, limit: number, startDate: string, endDate: string): Promise<any> {
+    const { _page, _limit } = getPagination(page, limit);
+
+    // Calculate the total number of users
+    const totalCars = await this.prismaService.car.count({
+      where: {
+        status: CarStatus.AVAILABLE,
+        OrderDetail: {
+          none: {
+            OR: [
+              {
+                startDate: {
+                  lte: new Date(startDate),
+                },
+                endDate: {
+                  gte: new Date(startDate),
+                },
+              },
+              {
+                startDate: {
+                  lte: new Date(endDate),
+                },
+                endDate: {
+                  gte: new Date(endDate),
+                },
+              },
+            ],
+          },
+        },
+      },
+    });
+    const totalPages = Math.ceil(totalCars / _limit);
+    const offset = (_page - 1) * _limit;
+
+    const cars = await this.prismaService.car.findMany({
+      skip: offset,
+      take: _limit,
+      where: {
+        status: CarStatus.AVAILABLE,
+        OrderDetail: {
+          none: {
+            OR: [
+              {
+                startDate: {
+                  lte: new Date(startDate),
+                },
+                endDate: {
+                  gte: new Date(startDate),
+                },
+              },
+              {
+                startDate: {
+                  lte: new Date(endDate),
+                },
+                endDate: {
+                  gte: new Date(endDate),
+                },
+              },
+            ],
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        transmission: true,
+        pricePerDay: true,
+        address: true,
+        status: true,
+        CarImage: {
+          select: {
+            url: true,
+          },
+        },
+        OrderDetail: {
+          select: {
+            id: true,
+          },
+          where: {
+            status: 'COMPLETED',
+          },
+        },
+        Review: {
+          select: {
+            id: true,
+            rating: true,
+          },
+        },
+      },
+    });
+
+    return {
+      data: cars.map((car) => ({
+        ...car,
+        pricePerDay: formatDecimalToNumber(car.pricePerDay),
+        thumbnail: car.CarImage[0].url,
+        trips: car.OrderDetail.length,
+        rating: car.Review.length > 0 ? car.Review.reduce((a, b) => a + b.rating, 0) / car.Review.length : 0,
+        address: car.address.split(',')[0],
+        CarImage: undefined,
+        OrderDetail: undefined,
+        Review: undefined,
+      })),
+      meta: {
+        totalPages,
+        _page,
+        _limit,
+        totalCars,
+      },
+    };
   }
 }

@@ -1,4 +1,15 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  InternalServerErrorException,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -155,6 +166,41 @@ export class CarsController {
       return this.carsService.removeById(+id);
     } catch (e) {
       throw new Error(e);
+    }
+  }
+
+  @Public()
+  @Get('/newest/cars')
+  getNewestCar(): Promise<any> {
+    try {
+      return this.carsService.getNewestCar();
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
+
+  @Public()
+  @Get('/slug/:slug')
+  getCarBySlug(@Param('slug') slug: string): Promise<any> {
+    try {
+      return this.carsService.getCarBySlug(slug);
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
+
+  @Public()
+  @Get('/search/cars')
+  searchCars(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 12,
+    @Query('startDate') startDate: string,
+    @Query('endDate') endDate: string,
+  ): Promise<any> {
+    try {
+      return this.carsService.searchCars(page, limit, startDate, endDate);
+    } catch (e) {
+      throw new InternalServerErrorException(e);
     }
   }
 }
