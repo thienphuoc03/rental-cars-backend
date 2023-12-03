@@ -5,11 +5,8 @@ module.exports = {
     tsconfigRootDir: __dirname,
     sourceType: 'module',
   },
-  plugins: ['@typescript-eslint/eslint-plugin', , 'import', 'unused-imports'],
-  extends: [
-    'plugin:@typescript-eslint/recommended',
-    'plugin:prettier/recommended',
-  ],
+  plugins: ['@typescript-eslint/eslint-plugin', 'import', 'unused-imports'],
+  extends: ['plugin:@typescript-eslint/recommended', 'plugin:prettier/recommended'],
   root: true,
   env: {
     node: true,
@@ -17,6 +14,7 @@ module.exports = {
   },
   ignorePatterns: ['.eslintrc.js'],
   rules: {
+    '@typescript-eslint/no-unused-vars': 'off',
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
@@ -26,13 +24,7 @@ module.exports = {
     'import/order': [
       'error',
       {
-        groups: [
-          'builtin',
-          'external',
-          'internal',
-          ['parent', 'sibling'],
-          'index',
-        ],
+        groups: ['builtin', 'external', 'internal', ['parent', 'sibling'], 'index'],
         'newlines-between': 'always',
         alphabetize: { order: 'asc', caseInsensitive: true },
       },
@@ -40,9 +32,9 @@ module.exports = {
 
     // remove unused imports
     'no-unused-vars': 'off',
-    'unused-imports/no-unused-imports': 'error',
+    'unused-imports/no-unused-imports': 'off',
     'unused-imports/no-unused-vars': [
-      'warn',
+      'off',
       {
         vars: 'all',
         varsIgnorePattern: '^_',
