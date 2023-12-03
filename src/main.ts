@@ -2,6 +2,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
+import { json, urlencoded } from 'express';
 
 import { AppModule } from './app.module';
 
@@ -14,6 +15,8 @@ async function bootstrap() {
 
   // Server
   app.setGlobalPrefix('api/v1');
+  app.use(json({ limit: '50mb' }));
+  app.use(urlencoded({ extended: true, limit: '50mb' }));
 
   // Config Cookie
   app.use(cookieParser());
@@ -40,9 +43,7 @@ async function bootstrap() {
   SwaggerModule.setup('api/v1/docs', app, document);
 
   await app.listen(PORT, HOSTNAME, async () => {
-    console.log(
-      `Application is running on: ${await app.getUrl()} - http://${HOSTNAME}:${PORT}`,
-    );
+    console.log(`Application is running on: ${await app.getUrl()} - http://${HOSTNAME}:${PORT}`);
   });
 }
 

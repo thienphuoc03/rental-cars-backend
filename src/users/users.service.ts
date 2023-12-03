@@ -1,14 +1,18 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { RoleName } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { convertBase64ToFile, getPagination } from 'utils/utils';
 
 import { UpdateRoleUserDto } from './dto';
-import { getPagination } from '../../utils/utils';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly cloudinaryService: CloudinaryService,
+  ) {}
 
   async getAllUsers(page: number, limit: number): Promise<any> {
     const { _page, _limit } = getPagination(page, limit);
@@ -91,9 +95,7 @@ export class UsersService {
 
     if (!user) throw new NotFoundException(`User with id ${id} not found`);
 
-    const userResponse = { ...user, role: user.role.name };
-
-    return userResponse;
+    return { ...user, role: user.role.name };
   }
 
   async getUserByUsername(username: string): Promise<any> {
@@ -124,9 +126,7 @@ export class UsersService {
 
     if (!user) throw new NotFoundException(`User with username ${username} not found`);
 
-    const userResponse = { ...user, role: user.role.name };
-
-    return userResponse;
+    return { ...user, role: user.role.name };
   }
 
   async getProfile(currentUser: any): Promise<any> {
@@ -142,6 +142,20 @@ export class UsersService {
         id: true,
       },
     });
+
+    // upload avatar
+    if (!data.avatarUrl) {
+      data.avatarUrl =
+        'https://res.cloudinary.com/dj1v6wmjv/image/upload/v1701074365/rental-cars-cloudinary/avatars/avatar-default.jpg';
+    }
+
+    const avatarFile = convertBase64ToFile(data.avatarUrl);
+
+    const nameImage = `${data.username}-${Date.now()}-avatar`;
+    const avatar = await this.cloudinaryService.uploadAvatar(avatarFile, nameImage);
+    console.log({ avatar });
+
+    data.avatarUrl = avatar.url;
 
     delete data.role;
 
@@ -175,16 +189,15 @@ export class UsersService {
       },
     });
 
-    const userResponse = { ...user, role: user.role.name };
+    if (!user) throw new Error('Cannot create user');
 
-    return userResponse;
+    return { ...user, role: user.role.name };
   }
 
   async updateUser(id: number, data: any): Promise<any> {
     // hash password
     if (data.password) {
-      const hashedPassword = await bcrypt.hash(data.password, 10);
-      data.password = hashedPassword;
+      data.password = await bcrypt.hash(data.password, 10);
     }
 
     const user = await this.prismaService.user.update({
@@ -215,9 +228,7 @@ export class UsersService {
 
     if (!user) throw new NotFoundException(`User with id ${id} not found`);
 
-    const userResponse = { ...user, role: user.role.name };
-
-    return userResponse;
+    return { ...user, role: user.role.name };
   }
 
   async deleteUser(id: number): Promise<any> {
@@ -270,9 +281,7 @@ export class UsersService {
       },
     });
 
-    const userResponse = { ...user, role: user.role.name };
-
-    return userResponse;
+    return { ...user, role: user.role.name };
   }
 
   async uploadAvatar(currentUser: any, image: any): Promise<any> {
@@ -309,8 +318,6 @@ export class UsersService {
 
     if (!user) throw new NotFoundException(`User with id ${id} not found`);
 
-    const userResponse = { ...user, role: user.role.name };
-
-    return userResponse;
+    return { ...user, role: user.role.name };
   }
 }

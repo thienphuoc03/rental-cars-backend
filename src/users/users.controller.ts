@@ -275,7 +275,7 @@ export class UsersController {
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @ApiResponse({ status: 500, description: 'Internal server error' })
-  @ApiConsumes('multipart/form-data')
+  @ApiConsumes('multipart/forms-data')
   @ApiBody({
     description: 'List of cats',
     type: UploadAvatarDto,
@@ -284,16 +284,23 @@ export class UsersController {
   @UseGuards(RolesGuard)
   @UseInterceptors(FileInterceptor('file'))
   @Patch('avatar/upload')
-  async uploadAvatar(@GetCurrentUser() currentUser: any, @UploadedFile() file: Express.Multer.File): Promise<any> {
+  async uploadAvatar(
+    @GetCurrentUser() currentUser: any,
+    @UploadedFile('file') file: Express.Multer.File,
+  ): Promise<any> {
     try {
       const nameImage = `${currentUser.username}-${Date.now()}-avatar`;
+
+      console.log({ file });
 
       if (!file) throw new Error('File not found');
       const image = await this.cloudinaryService.uploadAvatar(file, nameImage);
 
+      console.log({ image });
+
       return this.usersService.uploadAvatar(currentUser, image);
     } catch (error) {
-      throw new Error(error.message);
+      throw new Error(error);
     }
   }
 }

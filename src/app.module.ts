@@ -1,6 +1,7 @@
 import { ClassSerializerInterceptor, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { MulterModule } from '@nestjs/platform-express';
 import { JwtAuthGuard } from 'src/auth/guards';
 
 import { AuthModule } from './auth/auth.module';
@@ -23,6 +24,9 @@ import { UsersModule } from './users/users.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ envFilePath: ['.env.local'] }),
+    MulterModule.register({
+      dest: './upload',
+    }),
     PrismaModule,
     AuthModule,
     UsersModule,
