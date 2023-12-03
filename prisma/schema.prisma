@@ -202,7 +202,7 @@ enum Gender {
 
 enum CarStatus {
   AVAILABLE   @map("san_sang")
-  RENTED      @map("da_thue")
+  RENTING     @map("da_thue")
   UNAVAILABLE @map("khong_san_sang")
 }
 

@@ -77,6 +77,8 @@ export class CarsService {
         pricePerDay: true,
         address: true,
         status: true,
+        createdAt: true,
+        updatedAt: true,
         model: {
           select: {
             name: true,
@@ -110,6 +112,7 @@ export class CarsService {
       brand: car.model.brand.name,
       CarImage: car.CarImage.map((image) => image.url),
       CarFeature: car.CarFeature.map((feature) => feature.feature.name),
+      pricePerDay: formatDecimalToNumber(car.pricePerDay),
     }));
 
     return {
@@ -141,6 +144,8 @@ export class CarsService {
         pricePerDay: true,
         address: true,
         status: true,
+        createdAt: true,
+        updatedAt: true,
         model: {
           select: {
             name: true,
@@ -172,15 +177,13 @@ export class CarsService {
       throw new NotFoundException(`Car with id ${id} not found`);
     }
 
-    const carResponse = {
+    return {
       ...car,
       model: car.model.name,
       brand: car.model.brand.name,
       CarImage: car.CarImage.map((image) => image.url),
       CarFeature: car.CarFeature.map((feature) => feature.feature.name),
     };
-
-    return carResponse;
   }
 
   async updateCarById(id: number, updateCarDto: UpdateCarDto): Promise<any> {
@@ -227,6 +230,8 @@ export class CarsService {
         pricePerDay: true,
         address: true,
         status: true,
+        createdAt: true,
+        updatedAt: true,
         model: {
           select: {
             name: true,
@@ -254,15 +259,13 @@ export class CarsService {
       },
     });
 
-    const carResponse = {
+    return {
       ...car,
       model: car.model.name,
       brand: car.model.brand.name,
       CarImage: car.CarImage.map((image) => image.url),
       CarFeature: car.CarFeature.map((feature) => feature.feature.name),
     };
-
-    return carResponse;
   }
 
   async removeById(id: number): Promise<any> {
@@ -296,6 +299,8 @@ export class CarsService {
         pricePerDay: true,
         address: true,
         status: true,
+        createdAt: true,
+        updatedAt: true,
         CarImage: {
           select: {
             url: true,
@@ -346,6 +351,8 @@ export class CarsService {
         pricePerDay: true,
         address: true,
         status: true,
+        createdAt: true,
+        updatedAt: true,
         CarImage: {
           select: {
             url: true,
@@ -495,6 +502,8 @@ export class CarsService {
         pricePerDay: true,
         address: true,
         status: true,
+        createdAt: true,
+        updatedAt: true,
         CarImage: {
           select: {
             url: true,
