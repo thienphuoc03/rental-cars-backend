@@ -106,7 +106,6 @@ export class CarsController {
   @ApiResponse({ status: 404, description: 'Car not found.' })
   @ApiResponse({ status: 500, description: 'Internal server error.' })
   @ApiParam({ name: 'id', required: true, type: Number, example: 1 })
-  @UseGuards(RolesGuard)
   @Public()
   @Get(':id')
   findOneById(@Param('id') id: number): Promise<any> {
