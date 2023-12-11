@@ -12,7 +12,7 @@ import {
 } from '@nestjs/swagger';
 import { RoleName } from '@prisma/client';
 import { MetaSchema } from 'schemas';
-import { Roles } from 'src/auth/decorators';
+import { GetCurrentUser, Public, Roles } from 'src/auth/decorators';
 import { RolesGuard } from 'src/auth/guards';
 
 import { CreateOrderDetailDto, OrderDetailDto, UpdateOrderDetailDto } from './dto';
@@ -161,7 +161,25 @@ export class OrderDetailController {
     return this.orderDetailService.removeById(+id);
   }
 
+  @Public()
+  @Get('order/:orderId')
   getAllByOrderId(orderId: number): Promise<any> {
     return this.orderDetailService.getAllByOrderId(orderId);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(RoleName.ADMIN, RoleName.TRAVELER, RoleName.CAROWNER)
+  @Get('/user/my-orders')
+  getAllByUserId(@GetCurrentUser() currentUser: any): Promise<any> {
+    const { id } = currentUser;
+
+    return this.orderDetailService.getAllByUserId(id);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(RoleName.ADMIN, RoleName.TRAVELER, RoleName.CAROWNER)
+  @Patch('/update/status/:id')
+  updateOrderDetailStatusById(@Param('id') id: number, @Body() updateOrderDetailDto: any): Promise<any> {
+    return this.orderDetailService.updateOrderDetailStatusById(+id, updateOrderDetailDto);
   }
 }
