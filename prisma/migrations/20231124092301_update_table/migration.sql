@@ -5,7 +5,7 @@
 
 */
 -- AlterTable
-ALTER TABLE `mau_sac_xe` MODIFY `ten_mau_sac_xe` ENUM('den', 'trang', 'do', 'xanh_duong', 'vang', 'cam', 'xanh_la', 'tim', 'hong', 'nau', 'xam', 'bac', 'vang', 'vang_nhat') NOT NULL;
+ALTER TABLE `mau_sac_xe` MODIFY `ten_mau_sac_xe` ENUM('den', 'trang', 'do', 'xanh_duong', 'vang', 'cam', 'xanh_la', 'tim', 'hong', 'nau', 'xam', 'bac', 'vang_nhat') NOT NULL;
 
 -- AlterTable
 ALTER TABLE `nguoi_dung` ADD COLUMN `ngay_sinh` DATETIME(3) NULL;

@@ -95,7 +95,7 @@ export class UsersService {
                 carId: true,
               },
             },
-            status: true,
+            orderStatus: true,
           },
         },
         createdAt: true,
@@ -105,7 +105,7 @@ export class UsersService {
 
     // calculate success rate
     const totalTrips = user.Order.length;
-    const totalSuccessTrips = user.Order.filter((order) => order.status === 'COMPLETED').length;
+    const totalSuccessTrips = user.Order.filter((order) => order.orderStatus === 'COMPLETED').length;
     const successRate = (totalSuccessTrips / totalTrips) * 100 || 0;
 
     if (!user) throw new NotFoundException(`User with id ${id} not found`);

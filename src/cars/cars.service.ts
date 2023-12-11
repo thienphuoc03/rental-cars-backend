@@ -311,7 +311,7 @@ export class CarsService {
             id: true,
           },
           where: {
-            status: 'COMPLETED',
+            orderDetailStatus: 'COMPLETED',
           },
         },
         Review: {
@@ -372,7 +372,7 @@ export class CarsService {
             id: true,
           },
           where: {
-            status: 'COMPLETED',
+            orderDetailStatus: 'COMPLETED',
           },
         },
         Review: {
@@ -436,26 +436,11 @@ export class CarsService {
     const totalCars = await this.prismaService.car.count({
       where: {
         status: CarStatus.AVAILABLE,
+
         OrderDetail: {
           none: {
-            OR: [
-              {
-                startDate: {
-                  lte: new Date(startDate),
-                },
-                endDate: {
-                  gte: new Date(startDate),
-                },
-              },
-              {
-                startDate: {
-                  lte: new Date(endDate),
-                },
-                endDate: {
-                  gte: new Date(endDate),
-                },
-              },
-            ],
+            startDate: { lte: new Date(endDate) },
+            endDate: { gte: new Date(startDate) },
           },
         },
       },
@@ -470,24 +455,8 @@ export class CarsService {
         status: CarStatus.AVAILABLE,
         OrderDetail: {
           none: {
-            OR: [
-              {
-                startDate: {
-                  lte: new Date(startDate),
-                },
-                endDate: {
-                  gte: new Date(startDate),
-                },
-              },
-              {
-                startDate: {
-                  lte: new Date(endDate),
-                },
-                endDate: {
-                  gte: new Date(endDate),
-                },
-              },
-            ],
+            startDate: { lte: new Date(endDate) },
+            endDate: { gte: new Date(startDate) },
           },
         },
       },
@@ -514,7 +483,7 @@ export class CarsService {
             id: true,
           },
           where: {
-            status: 'COMPLETED',
+            orderDetailStatus: 'COMPLETED',
           },
         },
         Review: {

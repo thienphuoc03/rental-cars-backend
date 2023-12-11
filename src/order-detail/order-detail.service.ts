@@ -98,4 +98,35 @@ export class OrderDetailService {
 
     return `This action removes a #${id} orderDetail`;
   }
+
+  async getAllByOrderId(orderId: number): Promise<any> {
+    const orderDetails = await this.prismaService.orderDetail.findMany({
+      where: {
+        id: orderId,
+      },
+      select: {
+        id: true,
+        orderId: true,
+        car: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        pricePerDay: true,
+        deposits: true,
+        totalAmount: true,
+        orderDetailStatus: true,
+        paymentStatus: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    if (!orderDetails) {
+      throw new NotFoundException(`Order with id ${orderId} not found`);
+    }
+
+    return orderDetails;
+  }
 }
