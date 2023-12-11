@@ -31,5 +31,5 @@ export class CreateOrderDto {
   })
   @IsNotEmpty()
   @IsNumber()
-  customerId: number;
+  travelerId: number;
 }

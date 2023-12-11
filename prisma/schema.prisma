@@ -138,33 +138,35 @@ model CarFeature {
 }
 
 model Order {
-  id          Int           @id @default(autoincrement()) @map("ma_don_hang")
-  startDate   DateTime      @map("ngay_bat_dau")
-  endDate     DateTime      @map("ngay_ket_thuc")
-  totalAmount Decimal       @map("tong_tien") @db.Decimal(10, 2)
-  customer    User?         @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  customerId  Int?          @map("ma_nguoi_dung")
-  status      OrderStatus   @default(PENDING) @map("trang_thai")
-  createdAt   DateTime      @default(now()) @map("ngay_tao")
-  updatedAt   DateTime      @updatedAt @map("ngay_cap_nhat")
-  OrderDetail OrderDetail[]
+  id            Int            @id @default(autoincrement()) @map("ma_don_hang")
+  deposits      Decimal        @map("tien_dat_coc") @db.Decimal(10, 2)
+  totalAmount   Decimal        @map("tong_tien") @db.Decimal(10, 2)
+  traveler      User?          @relation(fields: [travelerId], references: [id], onDelete: Cascade)
+  travelerId    Int?           @map("ma_nguoi_dung")
+  orderStatus   OrderStatus    @default(PENDING) @map("trang_thai_don_hang")
+  paymentStatus PaymentStatus? @default(PENDING) @map("trang_thai_thanh_toan")
+  createdAt     DateTime       @default(now()) @map("ngay_tao")
+  updatedAt     DateTime       @updatedAt @map("ngay_cap_nhat")
+  OrderDetail   OrderDetail[]
 
   @@map("don_hang")
 }
 
 model OrderDetail {
-  id          Int         @id @default(autoincrement()) @map("ma_chi_tiet_don_hang")
-  order       Order?      @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  orderId     Int?        @map("ma_don_hang")
-  car         Car?        @relation(fields: [carId], references: [id], onDelete: Cascade)
-  carId       Int?        @map("ma_xe")
-  pricePerDay Decimal     @map("gia_thue_theo_ngay") @db.Decimal(10, 2)
-  startDate   DateTime    @map("ngay_bat_dau")
-  endDate     DateTime    @map("ngay_ket_thuc")
-  totalAmount Decimal     @map("tong_tien") @db.Decimal(10, 2)
-  status      OrderStatus @default(PENDING) @map("trang_thai")
-  createdAt   DateTime    @default(now()) @map("ngay_tao")
-  updatedAt   DateTime    @updatedAt @map("ngay_cap_nhat")
+  id                Int               @id @default(autoincrement()) @map("ma_chi_tiet_don_hang")
+  order             Order?            @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId           Int?              @map("ma_don_hang")
+  car               Car?              @relation(fields: [carId], references: [id], onDelete: Cascade)
+  carId             Int?              @map("ma_xe")
+  pricePerDay       Decimal           @map("gia_thue_theo_ngay") @db.Decimal(10, 2)
+  deposits          Decimal?          @map("tien_dat_coc") @db.Decimal(10, 2)
+  startDate         DateTime          @map("ngay_bat_dau") @db.Date
+  endDate           DateTime          @map("ngay_ket_thuc") @db.Date
+  totalAmount       Decimal           @map("tong_tien") @db.Decimal(10, 2)
+  orderDetailStatus OrderDetailStatus @default(PENDING) @map("trang_thai_chi_tiet_don_hang")
+  paymentStatus     PaymentStatus?    @default(PENDING) @map("trang_thai_thanh_toan")
+  createdAt         DateTime          @default(now()) @map("ngay_tao")
+  updatedAt         DateTime          @updatedAt @map("ngay_cap_nhat")
 
   @@map("chi_tiet_don_hang")
 }
@@ -207,19 +209,18 @@ enum CarStatus {
 }
 
 enum CarColorName {
-  BLACK     @map("den")
-  WHITE     @map("trang")
-  RED       @map("do")
-  BLUE      @map("xanh_duong")
-  YELLOW    @map("vang")
-  ORANGE    @map("cam")
-  GREEN     @map("xanh_la")
-  PURPLE    @map("tim")
-  PINK      @map("hong")
-  BROWN     @map("nau")
-  GREY      @map("xam")
-  SILVER    @map("bac")
-  CHAMPAGNE @map("vang_nhat")
+  BLACK  @map("den")
+  WHITE  @map("trang")
+  RED    @map("do")
+  BLUE   @map("xanh_duong")
+  YELLOW @map("vang")
+  ORANGE @map("cam")
+  GREEN  @map("xanh_la")
+  PURPLE @map("tim")
+  PINK   @map("hong")
+  BROWN  @map("nau")
+  GREY   @map("xam")
+  SILVER @map("bac")
 }
 
 enum Transmission {
@@ -238,6 +239,22 @@ enum OrderStatus {
   CONFIRMED @map("da_xac_nhan")
   CANCELED  @map("da_huy")
   COMPLETED @map("da_hoan_thanh")
+}
+
+enum OrderDetailStatus {
+  PENDING   @map("cho_xac_nhan")
+  CONFIRMED @map("da_xac_nhan")
+  CANCELED  @map("da_huy")
+  PAID      @map("da_thanh_toan")
+  RECEIVED  @map("da_nhan_xe")
+  COMPLETED @map("da_hoan_thanh")
+}
+
+enum PaymentStatus {
+  PENDING @map("cho_thanh_toan")
+  DEPOSIT @map("da_dat_coc")
+  PAID    @map("da_thanh_toan")
+  REFUND  @map("da_hoan_tien")
 }
 
 enum FeatureName {

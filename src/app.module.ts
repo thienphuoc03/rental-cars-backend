@@ -20,6 +20,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { RolesModule } from './roles/roles.module';
 import { UsersModule } from './users/users.module';
+import { StripeModule } from './stripe/stripe.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { UsersModule } from './users/users.module';
     CarFeaturesModule,
     ReviewsModule,
     CloudinaryModule,
+    StripeModule,
   ],
   controllers: [],
   providers: [

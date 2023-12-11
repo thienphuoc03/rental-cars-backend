@@ -26,7 +26,7 @@ import {
 } from '@nestjs/swagger';
 import { RoleName } from '@prisma/client';
 import { MetaSchema } from 'schemas';
-import { GetCurrentUser, Roles } from 'src/auth/decorators';
+import { GetCurrentUser, Public, Roles } from 'src/auth/decorators';
 import { RolesGuard } from 'src/auth/guards';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { UploadAvatarDto } from 'src/users/dto/upload-avatar.dto';
@@ -101,8 +101,7 @@ export class UsersController {
   @ApiResponse({ status: 500, description: 'Internal server error' })
   @ApiParam({ name: 'id', required: true, type: Number })
   @Get(':id')
-  @Roles(RoleName.ADMIN, RoleName.TRAVELER, RoleName.CAROWNER)
-  @UseGuards(RolesGuard)
+  @Public()
   getUserById(@Param('id') id: number): Promise<UserDto> {
     try {
       return this.usersService.getUserById(id);

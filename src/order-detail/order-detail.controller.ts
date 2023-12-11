@@ -160,4 +160,8 @@ export class OrderDetailController {
   removeById(@Param('id') id: number): Promise<any> {
     return this.orderDetailService.removeById(+id);
   }
+
+  getAllByOrderId(orderId: number): Promise<any> {
+    return this.orderDetailService.getAllByOrderId(orderId);
+  }
 }

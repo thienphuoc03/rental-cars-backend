@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -42,7 +42,7 @@ export class OrdersController {
   @UseGuards(RolesGuard)
   @Roles(RoleName.ADMIN, RoleName.CAROWNER, RoleName.TRAVELER)
   @Post()
-  createOrder(@GetCurrentUser() currentUser: any, @Body() createOrderDto: CreateOrderDto): Promise<any> {
+  createOrder(@GetCurrentUser() currentUser: any, @Body() createOrderDto: any): Promise<any> {
     try {
       return this.ordersService.createOrder(currentUser, createOrderDto);
     } catch (error) {

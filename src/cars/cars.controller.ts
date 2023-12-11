@@ -106,7 +106,6 @@ export class CarsController {
   @ApiResponse({ status: 404, description: 'Car not found.' })
   @ApiResponse({ status: 500, description: 'Internal server error.' })
   @ApiParam({ name: 'id', required: true, type: Number, example: 1 })
-  @UseGuards(RolesGuard)
   @Public()
   @Get(':id')
   findOneById(@Param('id') id: number): Promise<any> {
@@ -199,6 +198,30 @@ export class CarsController {
   ): Promise<any> {
     try {
       return this.carsService.searchCars(page, limit, startDate, endDate);
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(RoleName.ADMIN, RoleName.CAROWNER)
+  @Get('/user/my-cars')
+  getAllCarByUserId(@GetCurrentUser() currentUser: any): Promise<any> {
+    try {
+      const userId = currentUser.id;
+
+      return this.carsService.getAllCarByUserId(+userId);
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(RoleName.ADMIN, RoleName.CAROWNER)
+  @Patch('/status/:id')
+  updateCarStatus(@Param('id') id: number, @Body() body: any): Promise<any> {
+    try {
+      return this.carsService.updateCarStatus(+id, body);
     } catch (e) {
       throw new InternalServerErrorException(e);
     }

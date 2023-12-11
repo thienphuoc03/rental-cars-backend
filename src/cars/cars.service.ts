@@ -311,7 +311,7 @@ export class CarsService {
             id: true,
           },
           where: {
-            status: 'COMPLETED',
+            orderDetailStatus: 'COMPLETED',
           },
         },
         Review: {
@@ -372,7 +372,7 @@ export class CarsService {
             id: true,
           },
           where: {
-            status: 'COMPLETED',
+            orderDetailStatus: 'COMPLETED',
           },
         },
         Review: {
@@ -436,26 +436,11 @@ export class CarsService {
     const totalCars = await this.prismaService.car.count({
       where: {
         status: CarStatus.AVAILABLE,
+
         OrderDetail: {
           none: {
-            OR: [
-              {
-                startDate: {
-                  lte: new Date(startDate),
-                },
-                endDate: {
-                  gte: new Date(startDate),
-                },
-              },
-              {
-                startDate: {
-                  lte: new Date(endDate),
-                },
-                endDate: {
-                  gte: new Date(endDate),
-                },
-              },
-            ],
+            startDate: { lte: new Date(endDate) },
+            endDate: { gte: new Date(startDate) },
           },
         },
       },
@@ -470,24 +455,8 @@ export class CarsService {
         status: CarStatus.AVAILABLE,
         OrderDetail: {
           none: {
-            OR: [
-              {
-                startDate: {
-                  lte: new Date(startDate),
-                },
-                endDate: {
-                  gte: new Date(startDate),
-                },
-              },
-              {
-                startDate: {
-                  lte: new Date(endDate),
-                },
-                endDate: {
-                  gte: new Date(endDate),
-                },
-              },
-            ],
+            startDate: { lte: new Date(endDate) },
+            endDate: { gte: new Date(startDate) },
           },
         },
       },
@@ -514,7 +483,7 @@ export class CarsService {
             id: true,
           },
           where: {
-            status: 'COMPLETED',
+            orderDetailStatus: 'COMPLETED',
           },
         },
         Review: {
@@ -545,5 +514,88 @@ export class CarsService {
         totalCars,
       },
     };
+  }
+
+  async getAllCarByUserId(id: number): Promise<any> {
+    const cars = await this.prismaService.car.findMany({
+      where: {
+        userId: id,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        licensePlates: true,
+        seats: true,
+        yearOfManufacture: true,
+        transmission: true,
+        fuel: true,
+        description: true,
+        pricePerDay: true,
+        address: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+        model: {
+          select: {
+            name: true,
+            brand: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+        CarImage: {
+          select: {
+            url: true,
+          },
+        },
+        CarFeature: {
+          select: {
+            feature: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return cars.map((car) => ({
+      ...car,
+      model: car.model.name,
+      brand: car.model.brand.name,
+      pricePerDay: formatDecimalToNumber(car.pricePerDay),
+      CarImage: car.CarImage.map((image) => image.url),
+      CarFeature: car.CarFeature.map((feature) => feature.feature.name),
+    }));
+  }
+
+  async updateCarStatus(id: number, body: any): Promise<any> {
+    const exitsCar = await this.prismaService.car.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    if (!exitsCar) {
+      throw new NotFoundException(`Car with id ${id} not found`);
+    }
+
+    const car = await this.prismaService.car.update({
+      where: {
+        id,
+      },
+      data: {
+        status: body.status,
+      },
+    });
+
+    return car;
   }
 }

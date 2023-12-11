@@ -88,14 +88,35 @@ export class UsersService {
             name: true,
           },
         },
+        Order: {
+          select: {
+            OrderDetail: {
+              select: {
+                carId: true,
+              },
+            },
+            orderStatus: true,
+          },
+        },
         createdAt: true,
         updatedAt: true,
       },
     });
 
+    // calculate success rate
+    const totalTrips = user.Order.length;
+    const totalSuccessTrips = user.Order.filter((order) => order.orderStatus === 'COMPLETED').length;
+    const successRate = (totalSuccessTrips / totalTrips) * 100 || 0;
+
     if (!user) throw new NotFoundException(`User with id ${id} not found`);
 
-    return { ...user, role: user.role.name };
+    return {
+      ...user,
+      role: user.role.name,
+      trips: totalSuccessTrips,
+      successRate: successRate,
+      Order: undefined,
+    };
   }
 
   async getUserByUsername(username: string): Promise<any> {
