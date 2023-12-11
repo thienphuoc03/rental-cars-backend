@@ -515,4 +515,87 @@ export class CarsService {
       },
     };
   }
+
+  async getAllCarByUserId(id: number): Promise<any> {
+    const cars = await this.prismaService.car.findMany({
+      where: {
+        userId: id,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        licensePlates: true,
+        seats: true,
+        yearOfManufacture: true,
+        transmission: true,
+        fuel: true,
+        description: true,
+        pricePerDay: true,
+        address: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+        model: {
+          select: {
+            name: true,
+            brand: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+        CarImage: {
+          select: {
+            url: true,
+          },
+        },
+        CarFeature: {
+          select: {
+            feature: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return cars.map((car) => ({
+      ...car,
+      model: car.model.name,
+      brand: car.model.brand.name,
+      pricePerDay: formatDecimalToNumber(car.pricePerDay),
+      CarImage: car.CarImage.map((image) => image.url),
+      CarFeature: car.CarFeature.map((feature) => feature.feature.name),
+    }));
+  }
+
+  async updateCarStatus(id: number, body: any): Promise<any> {
+    const exitsCar = await this.prismaService.car.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    if (!exitsCar) {
+      throw new NotFoundException(`Car with id ${id} not found`);
+    }
+
+    const car = await this.prismaService.car.update({
+      where: {
+        id,
+      },
+      data: {
+        status: body.status,
+      },
+    });
+
+    return car;
+  }
 }

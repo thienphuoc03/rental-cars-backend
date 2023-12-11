@@ -202,4 +202,28 @@ export class CarsController {
       throw new InternalServerErrorException(e);
     }
   }
+
+  @UseGuards(RolesGuard)
+  @Roles(RoleName.ADMIN, RoleName.CAROWNER)
+  @Get('/user/my-cars')
+  getAllCarByUserId(@GetCurrentUser() currentUser: any): Promise<any> {
+    try {
+      const userId = currentUser.id;
+
+      return this.carsService.getAllCarByUserId(+userId);
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(RoleName.ADMIN, RoleName.CAROWNER)
+  @Patch('/status/:id')
+  updateCarStatus(@Param('id') id: number, @Body() body: any): Promise<any> {
+    try {
+      return this.carsService.updateCarStatus(+id, body);
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
 }
