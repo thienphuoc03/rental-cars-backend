@@ -177,9 +177,16 @@ export class OrderDetailController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles(RoleName.ADMIN, RoleName.TRAVELER, RoleName.CAROWNER)
+  @Roles(RoleName.ADMIN, RoleName.CAROWNER)
   @Patch('/update/status/:id')
   updateOrderDetailStatusById(@Param('id') id: number, @Body() updateOrderDetailDto: any): Promise<any> {
     return this.orderDetailService.updateOrderDetailStatusById(+id, updateOrderDetailDto);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(RoleName.ADMIN, RoleName.CAROWNER)
+  @Patch('/update/payment-status/:id')
+  updatePaymentStatusById(@Param('id') id: number, @Body() body: any): Promise<any> {
+    return this.orderDetailService.updatePaymentStatusById(+id, body);
   }
 }

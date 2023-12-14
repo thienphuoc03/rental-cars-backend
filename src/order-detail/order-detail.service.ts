@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { OrderDetailStatus } from '@prisma/client';
+import { OrderDetailStatus, PaymentStatus } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { formatDecimalToNumber, getPagination } from 'utils/utils';
 
@@ -140,27 +140,9 @@ export class OrderDetailService {
           },
         },
       },
-      // include: {
-      //   order: true,
-      //   car: true,
-      // },
-      // select: {
-      //   id: true,
-      //   orderId: true,
-      //   car: {
-      //     select: {
-      //       id: true,
-      //       name: true,
-      //     },
-      //   },
-      //   pricePerDay: true,
-      //   deposits: true,
-      //   totalAmount: true,
-      //   orderDetailStatus: true,
-      //   paymentStatus: true,
-      //   createdAt: true,
-      //   updatedAt: true,
-      // },
+      orderBy: {
+        createdAt: 'desc',
+      },
     });
 
     if (!orderDetails) {
@@ -185,6 +167,26 @@ export class OrderDetailService {
       },
       data: {
         orderDetailStatus: orderDetailStatus as OrderDetailStatus,
+      },
+    });
+
+    if (!orderDetail) {
+      throw new NotFoundException(`Order Detail with id ${id} not found`);
+    }
+
+    return orderDetail;
+  }
+
+  async updatePaymentStatusById(id: number, body: any): Promise<any> {
+    const { paymentStatus, carId } = body;
+
+    const orderDetail = await this.prismaService.orderDetail.update({
+      where: {
+        id,
+        carId,
+      },
+      data: {
+        paymentStatus: paymentStatus as PaymentStatus,
       },
     });
 
