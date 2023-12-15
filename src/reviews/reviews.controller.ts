@@ -10,7 +10,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { RoleName } from '@prisma/client';
-import { GetCurrentUser, Public, Roles } from 'src/auth/decorators';
+import { GetCurrentUser, Roles } from 'src/auth/decorators';
 import { RolesGuard } from 'src/auth/guards';
 
 import { CreateReviewDto, ReviewDto, UpdateReviewDto } from './dto';

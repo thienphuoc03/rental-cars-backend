@@ -1,14 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  UseGuards,
-  Query,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -48,9 +38,7 @@ export class FeaturesController {
   @UseGuards(RolesGuard)
   @Roles(RoleName.ADMIN)
   @Post()
-  createFeature(
-    @Body() createFeatureDto: CreateFeatureDto,
-  ): Promise<FeaturesDto> {
+  createFeature(@Body() createFeatureDto: CreateFeatureDto): Promise<FeaturesDto> {
     try {
       return this.featuresService.createFeature(createFeatureDto);
     } catch (error) {
@@ -94,10 +82,7 @@ export class FeaturesController {
   @UseGuards(RolesGuard)
   @Public()
   @Get()
-  findAllFeature(
-    @Query('page') page: number,
-    @Query('limit') limit: number,
-  ): Promise<any> {
+  findAllFeature(@Query('page') page: number, @Query('limit') limit: number): Promise<any> {
     try {
       return this.featuresService.findAllFeature(page, limit);
     } catch (error) {
@@ -146,10 +131,7 @@ export class FeaturesController {
   @UseGuards(RolesGuard)
   @Roles(RoleName.ADMIN)
   @Patch(':id')
-  updateFeature(
-    @Param('id') id: number,
-    @Body() updateFeatureDto: UpdateFeatureDto,
-  ): Promise<FeaturesDto> {
+  updateFeature(@Param('id') id: number, @Body() updateFeatureDto: UpdateFeatureDto): Promise<FeaturesDto> {
     try {
       return this.featuresService.updateFeature(+id, updateFeatureDto);
     } catch (error) {

@@ -245,7 +245,6 @@ enum OrderDetailStatus {
   PENDING   @map("cho_xac_nhan")
   CONFIRMED @map("da_xac_nhan")
   CANCELED  @map("da_huy")
-  PAID      @map("da_thanh_toan")
   RECEIVED  @map("da_nhan_xe")
   COMPLETED @map("da_hoan_thanh")
 }

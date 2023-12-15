@@ -1,10 +1,4 @@
-import {
-  CarColorName,
-  FeatureName,
-  Gender,
-  PrismaClient,
-  RoleName,
-} from '@prisma/client';
+import { CarColorName, FeatureName, Gender, PrismaClient, RoleName } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();

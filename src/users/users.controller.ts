@@ -295,8 +295,6 @@ export class UsersController {
       if (!file) throw new Error('File not found');
       const image = await this.cloudinaryService.uploadAvatar(file, nameImage);
 
-      console.log({ image });
-
       return this.usersService.uploadAvatar(currentUser, image);
     } catch (error) {
       throw new Error(error);

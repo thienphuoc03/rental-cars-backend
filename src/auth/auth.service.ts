@@ -1,8 +1,4 @@
-import {
-  ConflictException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { RoleName } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
@@ -34,8 +30,7 @@ export class AuthService {
       },
     });
 
-    if (existedUser)
-      throw new ConflictException('Username or email already exists');
+    if (existedUser) throw new ConflictException('Username or email already exists');
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -46,14 +41,16 @@ export class AuthService {
       },
     });
 
-    if (!defaultRole) throw new Error('Default role not found');
+    if (!defaultRole) throw new Error('Default role not');
+
+    const avatarDefaultUrl: string =
+      'https://res.cloudinary.com/dj1v6wmjv/image/upload/v1701074365/rental-cars-cloudinary/avatars/avatar-default.jpg';
 
     const user = await this.prismaService.user.create({
       data: {
         username,
         email,
-        avatarUrl:
-          'https://res.cloudinary.com/dj1v6wmjv/image/upload/v1700748175/rental-cars-cloudinary/sua7izt00p9yxf42b3k4.jpg',
+        avatarUrl: avatarDefaultUrl,
         password: hashedPassword,
         roleId: Number(defaultRole.id),
       },
@@ -72,9 +69,7 @@ export class AuthService {
       },
     });
 
-    const userResponse = { ...user, role: user.role.name };
-
-    return userResponse;
+    return { ...user, role: user.role.name };
   }
 
   async signIn({ username, password }: signInParams): Promise<any> {
@@ -101,21 +96,14 @@ export class AuthService {
       },
     });
 
-    if (!user)
-      throw new UnauthorizedException('Username or Password is incorrect!!!');
+    if (!user) throw new UnauthorizedException('Tài khoản hoặc mật khẩu không chính xác!!!');
 
     const hashedPassword = user.password;
     const isPasswordValid = await bcrypt.compare(password, hashedPassword);
 
-    if (!isPasswordValid)
-      throw new UnauthorizedException('Username or Password is incorrect!!!');
+    if (!isPasswordValid) throw new UnauthorizedException('Tài khoản hoặc mật khẩu không chính xác!!!');
 
-    const { accessToken, refreshToken } = await this.generateToken(
-      user.id,
-      user.username,
-      user.roleId,
-      user.role.name,
-    );
+    const { accessToken, refreshToken } = await this.generateToken(user.id, user.username, user.roleId, user.role.name);
 
     // Remove password from user object
     // eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
@@ -135,12 +123,7 @@ export class AuthService {
     };
   }
 
-  async generateToken(
-    userId: number,
-    username: string,
-    roleId: number,
-    role: string,
-  ) {
+  async generateToken(userId: number, username: string, roleId: number, role: string) {
     const payload = { sub: userId, username, roleId, role };
 
     const accessToken = await this.jwtService.signAsync(payload, {

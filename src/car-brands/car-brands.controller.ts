@@ -1,14 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  UseGuards,
-  Query,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -54,9 +44,7 @@ export class CarBrandsController {
   @Post()
   @Public()
   @UseGuards(RolesGuard)
-  createCarBrand(
-    @Body() createCarBrandDto: CreateCarBrandDto,
-  ): Promise<CarBrandDto> {
+  createCarBrand(@Body() createCarBrandDto: CreateCarBrandDto): Promise<CarBrandDto> {
     try {
       return this.carBrandsService.createCarBrand(createCarBrandDto);
     } catch (error) {
@@ -101,10 +89,7 @@ export class CarBrandsController {
   @UseGuards(RolesGuard)
   @Public()
   @Get()
-  findAllCarBrands(
-    @Query('page') page: number,
-    @Query('limit') limit: number,
-  ): Promise<any> {
+  findAllCarBrands(@Query('page') page: number, @Query('limit') limit: number): Promise<any> {
     try {
       return this.carBrandsService.findAllCarBrands(page, limit);
     } catch (error) {
@@ -164,10 +149,7 @@ export class CarBrandsController {
   @UseGuards(RolesGuard)
   @Roles(RoleName.ADMIN)
   @Patch(':id')
-  updateCarBrand(
-    @Param('id') id: number,
-    @Body() updateCarBrandDto: UpdateCarBrandDto,
-  ): Promise<CarBrandDto> {
+  updateCarBrand(@Param('id') id: number, @Body() updateCarBrandDto: UpdateCarBrandDto): Promise<CarBrandDto> {
     return this.carBrandsService.updateCarBrand(+id, updateCarBrandDto);
   }
 

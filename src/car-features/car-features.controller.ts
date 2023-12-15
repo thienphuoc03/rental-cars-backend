@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { CarFeaturesService } from './car-features.service';
@@ -35,10 +27,7 @@ export class CarFeaturesController {
   }
 
   @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateCarFeatureDto: UpdateCarFeatureDto,
-  ) {
+  update(@Param('id') id: string, @Body() updateCarFeatureDto: UpdateCarFeatureDto) {
     return this.carFeaturesService.update(+id, updateCarFeatureDto);
   }
 

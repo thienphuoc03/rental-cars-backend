@@ -1,11 +1,5 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
-import {
-  ApiExtraModels,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-  getSchemaPath,
-} from '@nestjs/swagger';
+import { ApiExtraModels, ApiOperation, ApiResponse, ApiTags, getSchemaPath } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
 import { Public } from './decorators';

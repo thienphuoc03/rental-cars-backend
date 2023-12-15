@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { OrderDetailStatus, PaymentStatus } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { getPagination } from 'utils/utils';
+import { formatDecimalToNumber, getPagination } from 'utils/utils';
 
 import { CreateOrderDetailDto } from './dto/create-order-detail.dto';
 import { UpdateOrderDetailDto } from './dto/update-order-detail.dto';
@@ -128,5 +129,71 @@ export class OrderDetailService {
     }
 
     return orderDetails;
+  }
+
+  async getAllByUserId(userId: number): Promise<any> {
+    const orderDetails = await this.prismaService.orderDetail.findMany({
+      where: {
+        car: {
+          user: {
+            id: userId,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    if (!orderDetails) {
+      throw new NotFoundException(`Order with id ${userId} not found`);
+    }
+
+    return orderDetails.map((orderDetail) => ({
+      ...orderDetail,
+      pricePerDay: formatDecimalToNumber(orderDetail.pricePerDay),
+      deposits: formatDecimalToNumber(orderDetail.deposits),
+      totalAmount: formatDecimalToNumber(orderDetail.totalAmount),
+    }));
+  }
+
+  async updateOrderDetailStatusById(id: number, updateOrderDetailDto: any): Promise<any> {
+    const { orderDetailStatus, carId } = updateOrderDetailDto;
+
+    const orderDetail = await this.prismaService.orderDetail.update({
+      where: {
+        id,
+        carId,
+      },
+      data: {
+        orderDetailStatus: orderDetailStatus as OrderDetailStatus,
+      },
+    });
+
+    if (!orderDetail) {
+      throw new NotFoundException(`Order Detail with id ${id} not found`);
+    }
+
+    return orderDetail;
+  }
+
+  async updatePaymentStatusById(id: number, body: any): Promise<any> {
+    const { paymentStatus, carId } = body;
+
+    const orderDetail = await this.prismaService.orderDetail.update({
+      where: {
+        id,
+        carId,
+      },
+      data: {
+        paymentStatus: paymentStatus as PaymentStatus,
+      },
+    });
+
+    if (!orderDetail) {
+      throw new NotFoundException(`Order Detail with id ${id} not found`);
+    }
+
+    return orderDetail;
   }
 }
