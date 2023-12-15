@@ -3,9 +3,9 @@ import { RoleName } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { convertBase64ToFile, getPagination } from 'utils/utils';
-import { PrismaService } from '../prisma/prisma.service';
 
 import { UpdateRoleUserDto } from './dto';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class UsersService {
@@ -168,15 +168,14 @@ export class UsersService {
     if (!data.avatarUrl) {
       data.avatarUrl =
         'https://res.cloudinary.com/dj1v6wmjv/image/upload/v1701074365/rental-cars-cloudinary/avatars/avatar-default.jpg';
+    } else {
+      const avatarFile = convertBase64ToFile(data.avatarUrl);
+
+      const nameImage = `${data.username}-${Date.now()}-avatar`;
+      const avatar = await this.cloudinaryService.uploadAvatar(avatarFile, nameImage);
+
+      data.avatarUrl = avatar.url;
     }
-
-    const avatarFile = convertBase64ToFile(data.avatarUrl);
-
-    const nameImage = `${data.username}-${Date.now()}-avatar`;
-    const avatar = await this.cloudinaryService.uploadAvatar(avatarFile, nameImage);
-    console.log({ avatar });
-
-    data.avatarUrl = avatar.url;
 
     delete data.role;
 
