@@ -1,14 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  UseGuards,
-  Query,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -97,10 +87,7 @@ export class RolesController {
   @UseGuards(RolesGuard)
   @Roles(RoleName.ADMIN)
   @Get()
-  findAllRoles(
-    @Query('page') page: number,
-    @Query('limit') limit: number,
-  ): Promise<any[]> {
+  findAllRoles(@Query('page') page: number, @Query('limit') limit: number): Promise<any[]> {
     try {
       return this.rolesService.findAllRoles(page, limit);
     } catch (error) {

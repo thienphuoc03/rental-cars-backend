@@ -1,14 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  UseGuards,
-  Query,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -56,9 +46,7 @@ export class CarColorsController {
   @UseGuards(RolesGuard)
   @Roles(RoleName.ADMIN)
   @Post()
-  createCarColor(
-    @Body() createCarColorDto: CreateCarColorDto,
-  ): Promise<CarColorsDto> {
+  createCarColor(@Body() createCarColorDto: CreateCarColorDto): Promise<CarColorsDto> {
     try {
       return this.carColorsService.createCarColor(createCarColorDto);
     } catch (error) {
@@ -114,10 +102,7 @@ export class CarColorsController {
   @UseGuards(RolesGuard)
   @Public()
   @Get()
-  findAllColor(
-    @Query('page') page: number,
-    @Query('limit') limit: number,
-  ): Promise<any> {
+  findAllColor(@Query('page') page: number, @Query('limit') limit: number): Promise<any> {
     try {
       return this.carColorsService.findAllColor(page, limit);
     } catch (error) {
@@ -179,10 +164,7 @@ export class CarColorsController {
   @UseGuards(RolesGuard)
   @Roles(RoleName.ADMIN)
   @Patch(':id')
-  updateColor(
-    @Param('id') id: number,
-    @Body() updateCarColorDto: UpdateCarColorDto,
-  ): Promise<CarColorsDto> {
+  updateColor(@Param('id') id: number, @Body() updateCarColorDto: UpdateCarColorDto): Promise<CarColorsDto> {
     try {
       return this.carColorsService.updateColor(+id, updateCarColorDto);
     } catch (error) {

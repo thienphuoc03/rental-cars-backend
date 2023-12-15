@@ -9,9 +9,7 @@ import { CreateFeatureDto, FeaturesDto, UpdateFeatureDto } from './dto';
 export class FeaturesService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async createFeature(
-    createFeatureDto: CreateFeatureDto,
-  ): Promise<FeaturesDto> {
+  async createFeature(createFeatureDto: CreateFeatureDto): Promise<FeaturesDto> {
     const { name } = createFeatureDto;
 
     const feature = await this.prismaService.feature.create({
@@ -66,10 +64,7 @@ export class FeaturesService {
     return feature;
   }
 
-  async updateFeature(
-    id: number,
-    updateFeatureDto: UpdateFeatureDto,
-  ): Promise<FeaturesDto> {
+  async updateFeature(id: number, updateFeatureDto: UpdateFeatureDto): Promise<FeaturesDto> {
     const { name } = updateFeatureDto;
 
     const feature = await this.prismaService.feature.update({

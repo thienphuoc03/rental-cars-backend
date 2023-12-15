@@ -3,9 +3,9 @@ import { RoleName } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { convertBase64ToFile, getPagination } from 'utils/utils';
+import { PrismaService } from '../prisma/prisma.service';
 
 import { UpdateRoleUserDto } from './dto';
-import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class UsersService {

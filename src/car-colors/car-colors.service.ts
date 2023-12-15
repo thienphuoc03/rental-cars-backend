@@ -9,9 +9,7 @@ import { CarColorsDto, CreateCarColorDto, UpdateCarColorDto } from './dto';
 export class CarColorsService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async createCarColor(
-    createCarColorDto: CreateCarColorDto,
-  ): Promise<CarColorsDto> {
+  async createCarColor(createCarColorDto: CreateCarColorDto): Promise<CarColorsDto> {
     const { name } = createCarColorDto;
 
     const carColor = await this.prismaService.carColor.create({
@@ -65,10 +63,7 @@ export class CarColorsService {
     return carColor;
   }
 
-  async updateColor(
-    id: number,
-    updateCarColorDto: UpdateCarColorDto,
-  ): Promise<CarColorsDto> {
+  async updateColor(id: number, updateCarColorDto: UpdateCarColorDto): Promise<CarColorsDto> {
     const { name } = updateCarColorDto;
 
     const carColor = await this.prismaService.carColor.update({

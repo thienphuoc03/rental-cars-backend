@@ -75,10 +75,7 @@ export class CarBrandsService {
     return carBrand;
   }
 
-  async updateCarBrand(
-    id: number,
-    updateCarBrandDto: UpdateCarBrandDto,
-  ): Promise<CarBrandDto> {
+  async updateCarBrand(id: number, updateCarBrandDto: UpdateCarBrandDto): Promise<CarBrandDto> {
     const { name } = updateCarBrandDto;
     const carBrand = await this.prismaService.carBrand.update({
       where: {

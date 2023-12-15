@@ -19,8 +19,8 @@ import { OrdersModule } from './orders/orders.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { RolesModule } from './roles/roles.module';
-import { UsersModule } from './users/users.module';
 import { StripeModule } from './stripe/stripe.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [

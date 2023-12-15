@@ -1,14 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  UseGuards,
-  Query,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -96,10 +86,7 @@ export class CarModelsController {
   @UseGuards(RolesGuard)
   @Public()
   @Get()
-  findAllCarModel(
-    @Query('page') page: number,
-    @Query('limit') limit: number,
-  ): Promise<any> {
+  findAllCarModel(@Query('page') page: number, @Query('limit') limit: number): Promise<any> {
     try {
       return this.carModelsService.findAllCarModel(page, limit);
     } catch (error) {
@@ -152,10 +139,7 @@ export class CarModelsController {
   @UseGuards(RolesGuard)
   @Roles(RoleName.ADMIN)
   @Patch(':id')
-  updateById(
-    @Param('id') id: string,
-    @Body() updateCarModelDto: UpdateCarModelDto,
-  ) {
+  updateById(@Param('id') id: string, @Body() updateCarModelDto: UpdateCarModelDto) {
     try {
       return this.carModelsService.updateById(+id, updateCarModelDto);
     } catch (error) {
