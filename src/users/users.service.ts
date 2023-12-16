@@ -215,16 +215,48 @@ export class UsersService {
   }
 
   async updateUser(id: number, data: any): Promise<any> {
+    const roleId = await this.prismaService.role.findFirst({
+      where: {
+        name: (data.role as RoleName) || RoleName.TRAVELER,
+      },
+      select: {
+        id: true,
+      },
+    });
+
     // hash password
     if (data.password) {
       data.password = await bcrypt.hash(data.password, 10);
     }
 
+    const existUser = await this.prismaService.user.findUnique({
+      where: {
+        id: Number(id),
+      },
+      select: {
+        avatarUrl: true,
+      },
+    });
+
+    if (data.avatarUrl !== existUser.avatarUrl) {
+      const avatarFile = convertBase64ToFile(data.avatarUrl);
+
+      const nameImage = `${data.username}-${Date.now()}-avatar`;
+      const avatar = await this.cloudinaryService.uploadAvatar(avatarFile, nameImage);
+
+      data.avatarUrl = avatar.url;
+    }
+
+    delete data.role;
+
     const user = await this.prismaService.user.update({
       where: {
         id: Number(id),
       },
-      data,
+      data: {
+        ...data,
+        roleId: Number(roleId.id),
+      },
       select: {
         id: true,
         name: true,
