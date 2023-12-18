@@ -38,3 +38,11 @@ export const convertBase64ToFile = (base64String: string): Express.Multer.File =
 
   return file;
 };
+
+export const calculatePercentageChange = (previousValue: number, currentValue: number): number | null => {
+  if (previousValue === 0) {
+    return currentValue === 0 ? 0 : 100; // Handle division by zero
+  }
+
+  return ((currentValue - previousValue) / previousValue) * 100;
+};

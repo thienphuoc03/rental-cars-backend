@@ -4,6 +4,7 @@ import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { MulterModule } from '@nestjs/platform-express';
 import { JwtAuthGuard } from 'src/auth/guards';
 
+import { AnalyticsModule } from './analytics/analytics.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtStrategy } from './auth/strategies';
 import { CarBrandsModule } from './car-brands/car-brands.module';
@@ -24,7 +25,7 @@ import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ envFilePath: ['.env.local'] }),
+    ConfigModule.forRoot({ isGlobal: true, envFilePath: ['.env.local'] }),
     MulterModule.register({
       dest: './upload',
     }),
@@ -44,6 +45,7 @@ import { UsersModule } from './users/users.module';
     ReviewsModule,
     CloudinaryModule,
     StripeModule,
+    AnalyticsModule,
   ],
   controllers: [],
   providers: [
