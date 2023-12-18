@@ -1,8 +1,8 @@
-import { DEFAULT_PAGE } from './constants';
+import { DEFAULT_LIMIT, DEFAULT_PAGE } from './constants';
 
 export const getPagination = (page: number, limit: number) => {
   const _page = Number(page) > 0 ? Number(page) : DEFAULT_PAGE;
-  const _limit = Number(limit) > 0 ? Number(limit) : 100000;
+  const _limit = Number(limit) > 0 ? Number(limit) : DEFAULT_LIMIT;
 
   return { _page, _limit };
 };

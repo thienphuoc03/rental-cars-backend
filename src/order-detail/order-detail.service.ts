@@ -196,4 +196,35 @@ export class OrderDetailService {
 
     return orderDetail;
   }
+
+  async getDisableDateByCarId(carId: number): Promise<any> {
+    const orderDetails = await this.prismaService.orderDetail.findMany({
+      where: {
+        carId: Number(carId),
+        AND: {
+          OR: [
+            {
+              orderDetailStatus: OrderDetailStatus.CONFIRMED,
+            },
+            {
+              orderDetailStatus: OrderDetailStatus.RECEIVED,
+            },
+            {
+              orderDetailStatus: OrderDetailStatus.COMPLETED,
+            },
+          ],
+        },
+      },
+      select: {
+        startDate: true,
+        endDate: true,
+      },
+    });
+
+    if (!orderDetails) {
+      throw new NotFoundException(`Order Detail with car id ${carId} not found`);
+    }
+
+    return orderDetails;
+  }
 }

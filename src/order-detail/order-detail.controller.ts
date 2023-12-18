@@ -189,4 +189,10 @@ export class OrderDetailController {
   updatePaymentStatusById(@Param('id') id: number, @Body() body: any): Promise<any> {
     return this.orderDetailService.updatePaymentStatusById(+id, body);
   }
+
+  @Public()
+  @Get('disable-date/car/:carId')
+  getDisableDateByCarId(@Param('carId') carId: number): Promise<any> {
+    return this.orderDetailService.getDisableDateByCarId(carId);
+  }
 }
