@@ -3,7 +3,7 @@ import { OrderDetailStatus, OrderStatus, PaymentStatus } from '@prisma/client';
 import * as moment from 'moment';
 import { OrderDetailService } from 'src/order-detail/order-detail.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { getPagination } from 'utils/utils';
+import { formatDecimalToNumber, getPagination } from 'utils/utils';
 
 import { UpdateOrderDto } from './dto';
 
@@ -118,8 +118,10 @@ export class OrdersService {
       select: {
         id: true,
         totalAmount: true,
+        deposits: true,
         traveler: {
           select: {
+            id: true,
             name: true,
           },
         },
@@ -128,6 +130,7 @@ export class OrdersService {
         paymentStatus: true,
         createdAt: true,
         updatedAt: true,
+        OrderDetail: true,
       },
     });
 
@@ -135,16 +138,20 @@ export class OrdersService {
       throw new NotFoundException(`Order with id ${id} not found`);
     }
 
-    // get order detail by order id
-    const orderDetails = await this.prismaService.orderDetail.findMany({
-      where: {
-        orderId: order.id,
-      },
-    });
-
-    const orderResponse = { ...order, orderDetail: [...orderDetails] };
-
-    return orderResponse;
+    return {
+      ...order,
+      totalAmount: formatDecimalToNumber(order.totalAmount),
+      deposits: formatDecimalToNumber(order.deposits),
+      traveler: order.traveler.name,
+      OrderDetail: order.OrderDetail.map((item: any) => {
+        return {
+          ...item,
+          pricePerDay: formatDecimalToNumber(item.pricePerDay),
+          totalAmount: formatDecimalToNumber(item.totalAmount),
+          deposits: formatDecimalToNumber(item.deposits),
+        };
+      }),
+    };
   }
 
   async updateOrderById(id: number, updateOrderDto: UpdateOrderDto): Promise<any> {
@@ -182,9 +189,7 @@ export class OrdersService {
       },
     });
 
-    const orderResponse = { ...order, orderDetail: [...orderDetails] };
-
-    return orderResponse;
+    return { ...order, orderDetail: [...orderDetails] };
   }
 
   async removeById(id: number): Promise<any> {
@@ -205,5 +210,45 @@ export class OrdersService {
     });
 
     return `This action removes a #${id} order`;
+  }
+
+  async getMyOrders(currentUser: any, page: number, limit: number): Promise<any> {
+    const { _page, _limit } = getPagination(page, limit);
+
+    const totalOrders = await this.prismaService.order.count({
+      where: {
+        travelerId: currentUser.id,
+      },
+    });
+    const totalPages = Math.ceil(totalOrders / _limit);
+
+    const offset = (_page - 1) * _limit;
+
+    const orders = await this.prismaService.order.findMany({
+      where: {
+        travelerId: currentUser.id,
+      },
+      skip: offset,
+      take: _limit,
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return {
+      data: orders.map((order: any) => {
+        return {
+          ...order,
+          totalAmount: formatDecimalToNumber(order.totalAmount),
+          deposits: formatDecimalToNumber(order.deposits),
+        };
+      }),
+      meta: {
+        totalPages,
+        _page,
+        _limit,
+        totalOrders,
+      },
+    };
   }
 }

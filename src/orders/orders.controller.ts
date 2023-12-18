@@ -162,4 +162,35 @@ export class OrdersController {
       throw new Error(error);
     }
   }
+
+  @ApiOperation({ summary: 'Get my orders' })
+  @ApiExtraModels(OrderDto)
+  @ApiResponse({
+    status: 200,
+    description: 'Get my orders successfully.',
+    content: {
+      'application/json': {
+        schema: { $ref: getSchemaPath(OrderDto) },
+      },
+    },
+  })
+  @ApiResponse({ status: 400, description: 'Bad request.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 500, description: 'Internal server error.' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @UseGuards(RolesGuard)
+  @Roles(RoleName.TRAVELER, RoleName.CAROWNER, RoleName.ADMIN)
+  @Get('user/my-orders')
+  getMyOrders(
+    @GetCurrentUser() currentUser: any,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ): Promise<any> {
+    try {
+      return this.ordersService.getMyOrders(currentUser, page, limit);
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
 }
