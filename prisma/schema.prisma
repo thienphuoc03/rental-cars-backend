@@ -22,7 +22,7 @@ model Role {
 
 model User {
   id          Int        @id @default(autoincrement()) @map("ma_nguoi_dung")
-  username    String     @unique @map("ten_dang_nhap") @db.VarChar(100)
+  username    String     @unique @map("tai_khoan") @db.VarChar(100)
   password    String     @map("mat_khau") @db.VarChar(100)
   name        String?    @map("ten_nguoi_dung") @db.VarChar(255)
   email       String?    @unique @map("email") @db.VarChar(100)

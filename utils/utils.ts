@@ -1,3 +1,5 @@
+import { Decimal } from '@prisma/client/runtime/library';
+
 import { DEFAULT_LIMIT, DEFAULT_PAGE } from './constants';
 
 export const getPagination = (page: number, limit: number) => {
@@ -16,7 +18,7 @@ export const generateSlug = (name: string): string => {
     .replace(/[^\w-]+/g, '')}-${ran}`;
 };
 
-export const formatDecimalToNumber = (value: any): number => {
+export const formatDecimalToNumber = (value: Decimal): number => {
   return Number(value.toFixed(2));
 };
 

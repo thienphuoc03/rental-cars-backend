@@ -54,13 +54,41 @@ export class OrderDetailService {
       where: {
         id,
       },
+      include: {
+        car: {
+          include: {
+            model: {
+              include: {
+                brand: true,
+              },
+            },
+            CarColor: true,
+            CarImage: true,
+          },
+        },
+      },
     });
 
     if (!orderDetail) {
       throw new NotFoundException(`Order Detail with id ${id} not found`);
     }
 
-    return orderDetail;
+    return {
+      ...orderDetail,
+      pricePerDay: formatDecimalToNumber(orderDetail.pricePerDay),
+      deposits: formatDecimalToNumber(orderDetail.deposits),
+      totalAmount: formatDecimalToNumber(orderDetail.totalAmount),
+      car: {
+        ...orderDetail.car,
+        pricePerDay: formatDecimalToNumber(orderDetail.car.pricePerDay),
+        model: orderDetail.car.model.name,
+        brand: orderDetail.car.model.brand.name,
+        color: orderDetail.car.CarColor.name,
+        images: orderDetail.car.CarImage.map((image) => image.url),
+        CarImage: undefined,
+        CarColor: undefined,
+      },
+    };
   }
 
   async updateById(id: number, updateOrderDetailDto: UpdateOrderDetailDto): Promise<any> {
@@ -149,32 +177,67 @@ export class OrderDetailService {
       throw new NotFoundException(`Order with id ${userId} not found`);
     }
 
-    return orderDetails.map((orderDetail) => ({
-      ...orderDetail,
-      pricePerDay: formatDecimalToNumber(orderDetail.pricePerDay),
-      deposits: formatDecimalToNumber(orderDetail.deposits),
-      totalAmount: formatDecimalToNumber(orderDetail.totalAmount),
-    }));
+    const today = new Date();
+    const todayString = today.toISOString().split('T')[0];
+    const todayNumber = Number(todayString.replace(/-/g, ''));
+
+    const updateOrderDetails = orderDetails.map(async (orderDetail) => {
+      const { startDate, orderDetailStatus } = orderDetail;
+      const startDateString = startDate.toISOString().split('T')[0];
+      const startDateNumber = Number(startDateString.replace(/-/g, ''));
+
+      if (startDateNumber <= todayNumber && orderDetailStatus === OrderDetailStatus.PENDING) {
+        const update = await this.prismaService.orderDetail.update({
+          where: {
+            id: orderDetail.id,
+          },
+          data: {
+            orderDetailStatus: OrderDetailStatus.CANCELED,
+            paymentStatus: PaymentStatus.REFUND,
+            note: 'Tự động hủy đơn do quá hạn',
+          },
+        });
+
+        return update;
+      }
+
+      return orderDetail;
+    });
+
+    return Promise.all(updateOrderDetails).then((orderDetail) =>
+      orderDetail.map((orderDetail) => ({
+        ...orderDetail,
+        pricePerDay: formatDecimalToNumber(orderDetail.pricePerDay),
+        deposits: formatDecimalToNumber(orderDetail.deposits),
+        totalAmount: formatDecimalToNumber(orderDetail.totalAmount),
+      })),
+    );
   }
 
   async updateOrderDetailStatusById(id: number, updateOrderDetailDto: any): Promise<any> {
-    const { orderDetailStatus, carId } = updateOrderDetailDto;
+    const data = {
+      ...updateOrderDetailDto,
+      carId: undefined,
+    };
 
     const orderDetail = await this.prismaService.orderDetail.update({
       where: {
         id,
-        carId,
+        carId: updateOrderDetailDto.carId,
       },
-      data: {
-        orderDetailStatus: orderDetailStatus as OrderDetailStatus,
-      },
+      data,
     });
 
     if (!orderDetail) {
       throw new NotFoundException(`Order Detail with id ${id} not found`);
     }
 
-    return orderDetail;
+    return {
+      ...orderDetail,
+      pricePerDay: formatDecimalToNumber(orderDetail.pricePerDay),
+      deposits: formatDecimalToNumber(orderDetail.deposits),
+      totalAmount: formatDecimalToNumber(orderDetail.totalAmount),
+    };
   }
 
   async updatePaymentStatusById(id: number, body: any): Promise<any> {
