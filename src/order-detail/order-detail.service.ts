@@ -64,6 +64,12 @@ export class OrderDetailService {
             },
             CarColor: true,
             CarImage: true,
+            user: true,
+          },
+        },
+        order: {
+          include: {
+            traveler: true,
           },
         },
       },
