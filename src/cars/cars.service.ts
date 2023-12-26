@@ -4,20 +4,25 @@ import { CarStatus, Fuel, Transmission } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { formatDecimalToNumber, generateSlug, getPagination } from 'utils/utils';
 
-import { CreateCarDto, UpdateCarDto } from './dto';
-
 @ApiBearerAuth()
 @ApiTags('cars-images')
 @Injectable()
 export class CarsService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async createCar(createCarDto: CreateCarDto, currentUser: any): Promise<any> {
-    const slug = generateSlug(createCarDto.name);
+  async createCar(createCarDto: any, currentUser: any): Promise<any> {
+    const model = await this.prismaService.carModel.findFirst({
+      where: {
+        id: Number(createCarDto.modelId),
+      },
+    });
+    const name = model.name + ' ' + createCarDto.yearOfManufacture;
+
+    const slug = generateSlug(createCarDto);
 
     const newCar = await this.prismaService.car.create({
       data: {
-        name: createCarDto.name,
+        name,
         slug,
         licensePlates: createCarDto.licensePlates,
         seats: createCarDto.seats,
@@ -26,23 +31,23 @@ export class CarsService {
         fuel: createCarDto.fuel.toUpperCase() as Fuel,
         description: createCarDto.description,
         pricePerDay: createCarDto.pricePerDay,
-        address: createCarDto.address,
+        address: 'createCarDto.address',
         status: CarStatus.UNAVAILABLE,
         modelId: Number(createCarDto.modelId),
         userId: currentUser.id,
         CarImage: {
           create: createCarDto.images.map((image) => ({
             url: image,
-            carId: newCar.id,
-          })),
-        },
-        CarFeature: {
-          create: createCarDto.features.map((feature) => ({
-            featureId: feature,
-            carId: newCar.id,
           })),
         },
       },
+    });
+
+    const carFeatures = await this.prismaService.carFeature.createMany({
+      data: createCarDto.features.map((feature: any) => ({
+        carId: newCar.id,
+        featureId: feature,
+      })),
     });
 
     return newCar;
@@ -63,6 +68,16 @@ export class CarsService {
       take: _limit,
       orderBy: {
         createdAt: 'desc',
+      },
+      where: {
+        OR: [
+          {
+            status: CarStatus.AVAILABLE,
+          },
+          {
+            status: CarStatus.UNAVAILABLE,
+          },
+        ],
       },
       select: {
         id: true,
@@ -148,9 +163,11 @@ export class CarsService {
         updatedAt: true,
         model: {
           select: {
+            id: true,
             name: true,
             brand: {
               select: {
+                id: true,
                 name: true,
               },
             },
@@ -183,10 +200,13 @@ export class CarsService {
       brand: car.model.brand.name,
       CarImage: car.CarImage.map((image) => image.url),
       CarFeature: car.CarFeature.map((feature) => feature.feature.name),
+      pricePerDay: formatDecimalToNumber(car.pricePerDay),
+      brandId: car.model.brand.id,
+      modelId: car.model.id,
     };
   }
 
-  async updateCarById(id: number, updateCarDto: UpdateCarDto): Promise<any> {
+  async updateCarById(id: number, updateCarDto: any): Promise<any> {
     const exitsCar = await this.prismaService.car.findFirst({
       where: {
         id,

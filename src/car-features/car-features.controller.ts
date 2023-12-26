@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { CarFeaturesService } from './car-features.service';
@@ -17,8 +17,8 @@ export class CarFeaturesController {
   }
 
   @Get()
-  findAll() {
-    return this.carFeaturesService.findAll();
+  findAll(@Query('page') page: number, @Query('limit') limit: number) {
+    return this.carFeaturesService.findAll(page, limit);
   }
 
   @Get(':id')

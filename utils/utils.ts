@@ -13,6 +13,7 @@ export const generateSlug = (name: string): string => {
   const ran = Math.floor(Math.random() * 1000000).toString();
 
   return `${name
+    .toString()
     .toLowerCase()
     .replace(/ /g, '-')
     .replace(/[^\w-]+/g, '')}-${ran}`;

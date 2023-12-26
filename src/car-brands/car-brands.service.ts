@@ -106,4 +106,25 @@ export class CarBrandsService {
 
     return `This action removes a #${id} carBrand`;
   }
+
+  async findAllCarBrandsWithModels(): Promise<any> {
+    const carBrands = await this.prismaService.carBrand.findMany({
+      include: {
+        CarModel: true,
+      },
+    });
+
+    return carBrands.map((carBrand) => {
+      return {
+        id: carBrand.id,
+        name: carBrand.name,
+        models: carBrand.CarModel.map((carModel) => {
+          return {
+            id: carModel.id,
+            name: carModel.name,
+          };
+        }),
+      };
+    });
+  }
 }

@@ -53,7 +53,7 @@ export class CarsController {
   @UseGuards(RolesGuard)
   @Roles(RoleName.ADMIN, RoleName.CAROWNER)
   @Post()
-  createCar(@GetCurrentUser() currentUser: any, @Body() createCarDto: CreateCarDto): Promise<any> {
+  createCar(@GetCurrentUser() currentUser: any, @Body() createCarDto: any): Promise<any> {
     try {
       return this.carsService.createCar(createCarDto, currentUser);
     } catch (e) {

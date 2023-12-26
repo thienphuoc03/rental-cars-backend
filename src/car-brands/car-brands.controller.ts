@@ -16,9 +16,7 @@ import { Public, Roles } from 'src/auth/decorators';
 import { RolesGuard } from 'src/auth/guards';
 
 import { CarBrandsService } from './car-brands.service';
-import { CarBrandDto } from './dto';
-import { CreateCarBrandDto } from './dto/create-car-brand.dto';
-import { UpdateCarBrandDto } from './dto/update-car-brand.dto';
+import { CarBrandDto, CreateCarBrandDto, UpdateCarBrandDto } from './dto';
 
 @ApiBearerAuth()
 @ApiTags('car-brands')
@@ -171,5 +169,15 @@ export class CarBrandsController {
   @Delete(':id')
   removeCarBrand(@Param('id') id: number): Promise<string> {
     return this.carBrandsService.removeCarBrand(+id);
+  }
+
+  @Public()
+  @Get('/and/models')
+  findAllCarBrandsWithModels(): Promise<any> {
+    try {
+      return this.carBrandsService.findAllCarBrandsWithModels();
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 }

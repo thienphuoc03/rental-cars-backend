@@ -3,16 +3,6 @@ import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateCarDto {
   @ApiProperty({
-    example: 'Audi A4',
-    description: 'The name of the car',
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @IsNotEmpty()
-  name: string;
-
-  @ApiProperty({
     example: '1111',
     required: true,
     type: String,
