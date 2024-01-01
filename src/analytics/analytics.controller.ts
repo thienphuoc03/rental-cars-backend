@@ -1,5 +1,5 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { RoleName } from '@prisma/client';
 import { Roles } from 'src/auth/decorators';
 import { RolesGuard } from 'src/auth/guards';
@@ -27,6 +27,31 @@ export class AnalyticsController {
   getCardAnalytics(): Promise<any> {
     try {
       return this.analyticsService.getCardAnalytics();
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  }
+
+  @ApiOperation({ summary: 'Get order analytics' })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully',
+  })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiQuery({ name: 'fromDay', required: false, type: Date })
+  @ApiQuery({ name: 'toDay', required: false, type: Date })
+  @Roles(RoleName.ADMIN)
+  @UseGuards(RolesGuard)
+  @Get('revenue')
+  getRevenueAnalytics(@Query('fromDay') fromDay: Date, @Query('toDay') toDay: Date): Promise<any> {
+    try {
+      const from = fromDay || new Date(new Date().getFullYear(), 0, 1);
+      const to = toDay || new Date();
+
+      return this.analyticsService.getRevenueAnalytics(from, to);
     } catch (error) {
       throw new Error(error.message);
     }

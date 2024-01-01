@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { OrderDetailStatus } from '@prisma/client';
 import { differenceInMonths } from 'date-fns';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -73,6 +74,61 @@ export class AnalyticsService {
     });
     const orderPercentageChange = calculatePercentageChange(ordersPreviousMonth.length, ordersLastMonth.length) || 0;
 
+    const orderDetailsLastMonth = await this.prismaService.orderDetail.findMany({
+      where: {
+        createdAt: {
+          gte: new Date(lastMonthStartDate),
+          lt: currentDate,
+        },
+        AND: {
+          OR: [
+            {
+              orderDetailStatus: OrderDetailStatus.CONFIRMED,
+            },
+            {
+              orderDetailStatus: OrderDetailStatus.RECEIVED,
+            },
+            {
+              orderDetailStatus: OrderDetailStatus.COMPLETED,
+            },
+          ],
+        },
+      },
+      select: {
+        serviceFee: true,
+      },
+    });
+    const orderDetailsPreviousMonth = await this.prismaService.orderDetail.findMany({
+      where: {
+        createdAt: {
+          gte: new Date(differenceInMonths(currentDate, 2)),
+          lt: new Date(lastMonthStartDate),
+        },
+        AND: {
+          OR: [
+            {
+              orderDetailStatus: OrderDetailStatus.CONFIRMED,
+            },
+            {
+              orderDetailStatus: OrderDetailStatus.RECEIVED,
+            },
+            {
+              orderDetailStatus: OrderDetailStatus.COMPLETED,
+            },
+          ],
+        },
+      },
+      select: {
+        serviceFee: true,
+      },
+    });
+    const revenuePercentageChange =
+      calculatePercentageChange(
+        orderDetailsPreviousMonth.reduce((acc, orderDetail) => acc + Number(orderDetail.serviceFee), 0),
+        orderDetailsLastMonth.reduce((acc, orderDetail) => acc + Number(orderDetail.serviceFee), 0),
+      ) || 0;
+    const totalRevenue = orderDetailsLastMonth.reduce((acc, orderDetail) => acc + Number(orderDetail.serviceFee), 0);
+
     return {
       user: {
         totalUsers,
@@ -86,6 +142,61 @@ export class AnalyticsService {
         totalOrders,
         orderPercentageChange,
       },
+      revenue: {
+        totalRevenue,
+        revenuePercentageChange,
+      },
     };
+  }
+
+  async getRevenueAnalytics(fromDay: Date, toDay: Date): Promise<any> {
+    const orderDetails = await this.prismaService.orderDetail.findMany({
+      where: {
+        createdAt: {
+          gte: fromDay,
+          lt: toDay,
+        },
+        AND: {
+          OR: [
+            {
+              orderDetailStatus: OrderDetailStatus.CONFIRMED,
+            },
+            {
+              orderDetailStatus: OrderDetailStatus.RECEIVED,
+            },
+            {
+              orderDetailStatus: OrderDetailStatus.COMPLETED,
+            },
+          ],
+        },
+      },
+      select: {
+        serviceFee: true,
+        createdAt: true,
+      },
+    });
+
+    // const countMonth = differenceInMonths(new Date(toDay), new Date(fromDay)) + 1;
+
+    const startingMonthIndex = new Date(fromDay).getMonth();
+    const endingMonthIndex = new Date(toDay).getMonth();
+
+    const revenueByMonth = Array.from({ length: endingMonthIndex - startingMonthIndex + 1 }, (_, monthIndex) => {
+      const monthName = new Date(new Date().getFullYear(), monthIndex + startingMonthIndex, 1).toLocaleString('vi-Vi', {
+        month: 'short',
+      });
+
+      return { month: monthName, totalRevenue: 0, totalOrder: 0 };
+    });
+
+    if (revenueByMonth.length !== 0) {
+      orderDetails.forEach((orderDetail) => {
+        const month = new Date(orderDetail.createdAt).getMonth() - new Date(fromDay).getMonth();
+        revenueByMonth[month].totalRevenue += Number(orderDetail.serviceFee);
+        revenueByMonth[month].totalOrder += 1;
+      });
+    }
+
+    return revenueByMonth;
   }
 }

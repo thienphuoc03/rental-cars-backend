@@ -296,4 +296,35 @@ export class OrderDetailService {
 
     return orderDetails;
   }
+
+  async getTotalRevenue(): Promise<any> {
+    const orderDetails = await this.prismaService.orderDetail.findMany({
+      where: {
+        OR: [
+          {
+            orderDetailStatus: OrderDetailStatus.CONFIRMED,
+          },
+          {
+            orderDetailStatus: OrderDetailStatus.RECEIVED,
+          },
+          {
+            orderDetailStatus: OrderDetailStatus.COMPLETED,
+          },
+        ],
+      },
+      select: {
+        serviceFee: true,
+      },
+    });
+
+    if (!orderDetails) {
+      throw new NotFoundException(`Order Detail not found`);
+    }
+
+    const totalRevenue = orderDetails.reduce((acc, orderDetail) => acc + Number(orderDetail.serviceFee), 0);
+
+    return {
+      totalRevenue,
+    };
+  }
 }

@@ -316,6 +316,7 @@ export class CarsService {
         name: true,
         slug: true,
         transmission: true,
+        fuel: true,
         pricePerDay: true,
         address: true,
         status: true,
@@ -617,5 +618,35 @@ export class CarsService {
     });
 
     return car;
+  }
+
+  async getAllCarIsRenting(): Promise<any> {
+    const cars = await this.prismaService.car.findMany({
+      where: {
+        status: CarStatus.RENTING,
+      },
+      include: {
+        model: {
+          include: {
+            brand: true,
+          },
+        },
+        CarImage: true,
+        CarFeature: {
+          include: {
+            feature: true,
+          },
+        },
+      },
+    });
+
+    return cars.map((car) => ({
+      ...car,
+      model: car.model.name,
+      brand: car.model.brand.name,
+      CarImage: car.CarImage.map((image) => image.url),
+      CarFeature: car.CarFeature.map((feature) => feature.feature.name),
+      pricePerDay: formatDecimalToNumber(car.pricePerDay),
+    }));
   }
 }

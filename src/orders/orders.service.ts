@@ -100,7 +100,13 @@ export class OrdersService {
     });
 
     return {
-      data: orders,
+      data: orders.map((order: any) => {
+        return {
+          ...order,
+          totalAmount: formatDecimalToNumber(order.totalAmount),
+          deposits: formatDecimalToNumber(order.deposits),
+        };
+      }),
       meta: {
         totalPages,
         _page,

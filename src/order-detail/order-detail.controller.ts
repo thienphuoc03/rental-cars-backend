@@ -195,4 +195,11 @@ export class OrderDetailController {
   getDisableDateByCarId(@Param('carId') carId: number): Promise<any> {
     return this.orderDetailService.getDisableDateByCarId(carId);
   }
+
+  @UseGuards(RolesGuard)
+  @Roles(RoleName.ADMIN)
+  @Get('dashboard/total-revenue')
+  getTotalRevenue(): Promise<any> {
+    return this.orderDetailService.getTotalRevenue();
+  }
 }

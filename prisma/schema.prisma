@@ -166,6 +166,7 @@ model OrderDetail {
   orderDetailStatus OrderDetailStatus @default(PENDING) @map("trang_thai_chi_tiet_don_hang")
   paymentStatus     PaymentStatus?    @default(PENDING) @map("trang_thai_thanh_toan")
   note              String?           @map("ghi_chu") @db.Text
+  serviceFee        Decimal?          @map("phi_dich_vu") @db.Decimal(10, 2)
   createdAt         DateTime          @default(now()) @map("ngay_tao")
   updatedAt         DateTime          @updatedAt @map("ngay_cap_nhat")
 
