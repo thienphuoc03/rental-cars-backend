@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+
 import { AnalyticsService } from './analytics.service';
 
 describe('AnalyticsService', () => {
