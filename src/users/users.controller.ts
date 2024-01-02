@@ -290,8 +290,6 @@ export class UsersController {
     try {
       const nameImage = `${currentUser.username}-${Date.now()}-avatar`;
 
-      console.log({ file });
-
       if (!file) throw new Error('File not found');
       const image = await this.cloudinaryService.uploadAvatar(file, nameImage);
 
