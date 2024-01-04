@@ -305,7 +305,14 @@ export class CarsService {
   async getNewestCar(): Promise<any> {
     const newestCar = await this.prismaService.car.findMany({
       where: {
-        status: CarStatus.AVAILABLE,
+        OR: [
+          {
+            status: CarStatus.AVAILABLE,
+          },
+          {
+            status: CarStatus.RENTING,
+          },
+        ],
       },
       take: 8,
       orderBy: {
@@ -330,9 +337,18 @@ export class CarsService {
         OrderDetail: {
           select: {
             id: true,
+            startDate: true,
+            endDate: true,
           },
           where: {
-            orderDetailStatus: 'COMPLETED',
+            OR: [
+              {
+                orderDetailStatus: 'CONFIRMED',
+              },
+              {
+                orderDetailStatus: 'RECEIVED',
+              },
+            ],
           },
         },
         Review: {
@@ -347,12 +363,18 @@ export class CarsService {
     return newestCar.map((car) => ({
       ...car,
       pricePerDay: formatDecimalToNumber(car.pricePerDay),
+      images: car.CarImage.map((image) => image.url),
       thumbnail: car.CarImage[0].url,
       trips: car.OrderDetail.length,
       rating: car.Review.length > 0 ? car.Review.reduce((a, b) => a + b.rating, 0) / car.Review.length : 0,
       address: car.address.split(',')[0],
+      orderDetails: car.OrderDetail.map((orderDetail) => ({
+        startDate: orderDetail.startDate,
+        endDate: orderDetail.endDate,
+      })),
       OrderDetail: undefined,
       Review: undefined,
+      CarImage: undefined,
     }));
   }
 
