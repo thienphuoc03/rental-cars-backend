@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { OrderDetailStatus } from '@prisma/client';
-import { differenceInMonths } from 'date-fns';
+import { addDays, endOfMonth, startOfMonth, subMonths } from 'date-fns';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 import { calculatePercentageChange } from './../../utils/utils';
@@ -12,73 +12,83 @@ export class AnalyticsService {
   async getCardAnalytics(): Promise<any> {
     const currentDate = new Date();
 
-    const lastMonthStartDate = differenceInMonths(currentDate, 1);
+    // start date and end date of the last month
+    const lastMonthStartDate = new Date(startOfMonth(subMonths(currentDate, 1)));
+    const lastMonthEndDate = new Date(endOfMonth(subMonths(currentDate, 1)));
+
+    // start date and end date of the current month
+    const currentMonthStartDate = new Date(addDays(startOfMonth(currentDate), 1));
+    const currentMonthEndDate = new Date(endOfMonth(currentDate));
+
+    // const lastMonthStartDate = differenceInMonths(currentDate, 1);
 
     const totalUsers = await this.prismaService.user.count();
     // Fetch user data from the last month
     const usersLastMonth = await this.prismaService.user.findMany({
       where: {
         createdAt: {
-          gte: new Date(lastMonthStartDate),
-          lt: currentDate,
+          gte: lastMonthStartDate,
+          lt: lastMonthEndDate,
         },
       },
     });
+
     // Fetch user and order data for the previous month
-    const usersPreviousMonth = await this.prismaService.user.findMany({
+    const usersCurrentMonth = await this.prismaService.user.findMany({
       where: {
         createdAt: {
-          gte: new Date(differenceInMonths(currentDate, 2)),
-          lt: new Date(lastMonthStartDate),
+          gte: currentMonthStartDate,
+          lt: currentMonthEndDate,
         },
       },
     });
+
     // Calculate the percentage change
-    const userPercentageChange = calculatePercentageChange(usersPreviousMonth.length, usersLastMonth.length) || 0;
+    const userPercentageChange = calculatePercentageChange(usersLastMonth.length, usersCurrentMonth.length) || 0;
 
     const totalCars = await this.prismaService.car.count();
     const carsLastMonth = await this.prismaService.car.findMany({
       where: {
         createdAt: {
-          gte: new Date(lastMonthStartDate),
-          lt: currentDate,
+          gte: lastMonthStartDate,
+          lt: lastMonthEndDate,
         },
       },
     });
     const carsPreviousMonth = await this.prismaService.car.findMany({
       where: {
         createdAt: {
-          gte: new Date(differenceInMonths(currentDate, 2)),
-          lt: new Date(lastMonthStartDate),
+          gte: currentMonthStartDate,
+          lt: currentMonthEndDate,
         },
       },
     });
-    const carPercentageChange = calculatePercentageChange(carsPreviousMonth.length, carsLastMonth.length) || 0;
+    const carPercentageChange = calculatePercentageChange(carsLastMonth.length, carsPreviousMonth.length) || 0;
 
     const totalOrders = await this.prismaService.order.count();
     const ordersLastMonth = await this.prismaService.order.findMany({
       where: {
         createdAt: {
-          gte: new Date(lastMonthStartDate),
-          lt: currentDate,
+          gte: lastMonthStartDate,
+          lt: lastMonthEndDate,
         },
       },
     });
     const ordersPreviousMonth = await this.prismaService.order.findMany({
       where: {
         createdAt: {
-          gte: new Date(differenceInMonths(currentDate, 2)),
-          lt: new Date(lastMonthStartDate),
+          gte: currentMonthStartDate,
+          lt: currentMonthEndDate,
         },
       },
     });
-    const orderPercentageChange = calculatePercentageChange(ordersPreviousMonth.length, ordersLastMonth.length) || 0;
+    const orderPercentageChange = calculatePercentageChange(ordersLastMonth.length, ordersPreviousMonth.length) || 0;
 
     const orderDetailsLastMonth = await this.prismaService.orderDetail.findMany({
       where: {
         createdAt: {
-          gte: new Date(lastMonthStartDate),
-          lt: currentDate,
+          gte: lastMonthStartDate,
+          lt: lastMonthEndDate,
         },
         AND: {
           OR: [
@@ -101,8 +111,8 @@ export class AnalyticsService {
     const orderDetailsPreviousMonth = await this.prismaService.orderDetail.findMany({
       where: {
         createdAt: {
-          gte: new Date(differenceInMonths(currentDate, 2)),
-          lt: new Date(lastMonthStartDate),
+          gte: currentMonthStartDate,
+          lt: currentMonthEndDate,
         },
         AND: {
           OR: [
@@ -124,8 +134,8 @@ export class AnalyticsService {
     });
     const revenuePercentageChange =
       calculatePercentageChange(
-        orderDetailsPreviousMonth.reduce((acc, orderDetail) => acc + Number(orderDetail.serviceFee), 0),
         orderDetailsLastMonth.reduce((acc, orderDetail) => acc + Number(orderDetail.serviceFee), 0),
+        orderDetailsPreviousMonth.reduce((acc, orderDetail) => acc + Number(orderDetail.serviceFee), 0),
       ) || 0;
     const totalRevenue = orderDetailsLastMonth.reduce((acc, orderDetail) => acc + Number(orderDetail.serviceFee), 0);
 
