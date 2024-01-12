@@ -221,10 +221,26 @@ export class OrderDetailService {
   }
 
   async updateOrderDetailStatusById(id: number, updateOrderDetailDto: any): Promise<any> {
-    const data = {
+    let data = {
       ...updateOrderDetailDto,
       carId: undefined,
     };
+
+    if (updateOrderDetailDto.carStatus) {
+      data = {
+        ...data,
+        carStatus: undefined,
+      };
+
+      await this.prismaService.car.update({
+        where: {
+          id: updateOrderDetailDto.carId,
+        },
+        data: {
+          status: updateOrderDetailDto.carStatus,
+        },
+      });
+    }
 
     const orderDetail = await this.prismaService.orderDetail.update({
       where: {

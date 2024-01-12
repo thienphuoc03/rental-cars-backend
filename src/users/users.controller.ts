@@ -298,4 +298,11 @@ export class UsersController {
       throw new Error(error);
     }
   }
+
+  @UseGuards(RolesGuard)
+  @Roles(RoleName.TRAVELER)
+  @Patch('register/role/owner')
+  ownerRegistration(@Body() body: any, @GetCurrentUser() currentUser: any) {
+    return this.usersService.ownerRegistration(body, currentUser);
+  }
 }

@@ -132,12 +132,19 @@ export class AnalyticsService {
         serviceFee: true,
       },
     });
+
+    const totalServiceFeeLastMonth = orderDetailsLastMonth.reduce(
+      (acc, orderDetail) => acc + Number(orderDetail.serviceFee),
+      0,
+    );
+    const totalServiceFeeCurrentMonth = orderDetailsPreviousMonth.reduce(
+      (acc, orderDetail) => acc + Number(orderDetail.serviceFee),
+      0,
+    );
+
     const revenuePercentageChange =
-      calculatePercentageChange(
-        orderDetailsLastMonth.reduce((acc, orderDetail) => acc + Number(orderDetail.serviceFee), 0),
-        orderDetailsPreviousMonth.reduce((acc, orderDetail) => acc + Number(orderDetail.serviceFee), 0),
-      ) || 0;
-    const totalRevenue = orderDetailsLastMonth.reduce((acc, orderDetail) => acc + Number(orderDetail.serviceFee), 0);
+      calculatePercentageChange(totalServiceFeeLastMonth, totalServiceFeeCurrentMonth) || 0;
+    const totalRevenue = totalServiceFeeLastMonth + totalServiceFeeCurrentMonth;
 
     return {
       user: {

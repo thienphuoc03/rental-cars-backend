@@ -191,6 +191,7 @@ enum RoleName {
   ADMIN    @map("QUAN_TRI_VIEN")
   CAROWNER @map("CHU_XE")
   TRAVELER @map("NGUOI_THUE_XE")
+  REGISTER @map("NGUOI_DUNG_DANG_KY")
 }
 
 enum UserStatus {
@@ -206,7 +207,7 @@ enum Gender {
 
 enum CarStatus {
   AVAILABLE   @map("san_sang")
-  RENTING     @map("da_thue")
+  RENTING     @map("dang_thue")
   UNAVAILABLE @map("khong_san_sang")
 }
 

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { RoleName } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
@@ -371,5 +371,37 @@ export class UsersService {
     if (!user) throw new NotFoundException(`User with id ${id} not found`);
 
     return { ...user, role: user.role.name };
+  }
+
+  async ownerRegistration(body: any, currentUser: any): Promise<any> {
+    const { name, email, phone, licensePlates } = body;
+
+    const isLicensePlates = await this.prismaService.car.findFirst({
+      where: {
+        licensePlates,
+      },
+    });
+
+    if (isLicensePlates) throw new BadRequestException(`Biển số xe: ${licensePlates} đã tồn tại`);
+
+    const ownerRole = await this.prismaService.role.findFirst({
+      where: {
+        name: RoleName.REGISTER,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    const user = await this.prismaService.user.update({
+      where: {
+        id: Number(currentUser.id),
+      },
+      data: {
+        roleId: Number(ownerRole.id),
+      },
+    });
+
+    return user;
   }
 }

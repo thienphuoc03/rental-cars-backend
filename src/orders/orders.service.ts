@@ -136,7 +136,15 @@ export class OrdersService {
         paymentStatus: true,
         createdAt: true,
         updatedAt: true,
-        OrderDetail: true,
+        OrderDetail: {
+          include: {
+            car: {
+              include: {
+                CarImage: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -149,14 +157,20 @@ export class OrdersService {
       totalAmount: formatDecimalToNumber(order.totalAmount),
       deposits: formatDecimalToNumber(order.deposits),
       traveler: order.traveler.name,
-      OrderDetail: order.OrderDetail.map((item: any) => {
+      orderDetails: order.OrderDetail.map((item: any) => {
         return {
           ...item,
           pricePerDay: formatDecimalToNumber(item.pricePerDay),
           totalAmount: formatDecimalToNumber(item.totalAmount),
           deposits: formatDecimalToNumber(item.deposits),
+          car: {
+            ...item.car,
+            images: item.car.CarImage.map((image: any) => image.url),
+            CarImage: undefined,
+          },
         };
       }),
+      OrderDetail: undefined,
     };
   }
 

@@ -47,5 +47,5 @@ export const calculatePercentageChange = (previousValue: number, currentValue: n
     return currentValue === 0 ? 0 : 100; // Handle division by zero
   }
 
-  return ((currentValue - previousValue) / previousValue) * 100;
+  return Math.floor(((currentValue - previousValue) / previousValue) * 100);
 };

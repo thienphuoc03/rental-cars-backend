@@ -118,6 +118,23 @@ export class CarsService {
             },
           },
         },
+        OrderDetail: {
+          select: {
+            id: true,
+            startDate: true,
+            endDate: true,
+          },
+          where: {
+            OR: [
+              {
+                orderDetailStatus: 'CONFIRMED',
+              },
+              {
+                orderDetailStatus: 'RECEIVED',
+              },
+            ],
+          },
+        },
       },
     });
 
@@ -128,6 +145,11 @@ export class CarsService {
       CarImage: car.CarImage.map((image) => image.url),
       CarFeature: car.CarFeature.map((feature) => feature.feature.name),
       pricePerDay: formatDecimalToNumber(car.pricePerDay),
+      orderDetails: car.OrderDetail.map((orderDetail) => ({
+        startDate: orderDetail.startDate,
+        endDate: orderDetail.endDate,
+      })),
+      OrderDetail: undefined,
     }));
 
     return {
@@ -182,7 +204,7 @@ export class CarsService {
           select: {
             feature: {
               select: {
-                name: true,
+                id: true,
               },
             },
           },
@@ -199,7 +221,7 @@ export class CarsService {
       model: car.model.name,
       brand: car.model.brand.name,
       CarImage: car.CarImage.map((image) => image.url),
-      CarFeature: car.CarFeature.map((feature) => feature.feature.name),
+      CarFeature: car.CarFeature.map((feature) => feature.feature.id),
       pricePerDay: formatDecimalToNumber(car.pricePerDay),
       brandId: car.model.brand.id,
       modelId: car.model.id,
@@ -521,12 +543,22 @@ export class CarsService {
             url: true,
           },
         },
+        fuel: true,
         OrderDetail: {
           select: {
             id: true,
+            startDate: true,
+            endDate: true,
           },
           where: {
-            orderDetailStatus: 'COMPLETED',
+            OR: [
+              {
+                orderDetailStatus: 'CONFIRMED',
+              },
+              {
+                orderDetailStatus: 'RECEIVED',
+              },
+            ],
           },
         },
         Review: {
@@ -546,6 +578,10 @@ export class CarsService {
         trips: car.OrderDetail.length,
         rating: car.Review.length > 0 ? car.Review.reduce((a, b) => a + b.rating, 0) / car.Review.length : 0,
         address: car.address.split(',')[0],
+        orderDetails: car.OrderDetail.map((orderDetail) => ({
+          startDate: orderDetail.startDate,
+          endDate: orderDetail.endDate,
+        })),
         CarImage: undefined,
         OrderDetail: undefined,
         Review: undefined,
