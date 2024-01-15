@@ -21,24 +21,26 @@ model Role {
 }
 
 model User {
-  id          Int        @id @default(autoincrement()) @map("ma_nguoi_dung")
-  username    String     @unique @map("tai_khoan") @db.VarChar(100)
-  password    String     @map("mat_khau") @db.VarChar(100)
-  name        String?    @map("ten_nguoi_dung") @db.VarChar(255)
-  email       String?    @unique @map("email") @db.VarChar(100)
-  phone       String?    @unique @map("so_dien_thoai") @db.VarChar(11)
-  gender      Gender?    @default(OTHER) @map("gioi_tinh")
-  dateOfBirth DateTime?  @map("ngay_sinh") @db.Date
-  address     String?    @map("dia_chi") @db.VarChar(255)
-  avatarUrl   String?    @map("avatar_url") @db.LongText
-  role        Role?      @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  roleId      Int?       @map("ma_vai_tro")
-  createdAt   DateTime   @default(now()) @map("ngay_tao")
-  updatedAt   DateTime   @updatedAt @map("ngay_cap_nhat")
-  status      UserStatus @default(ACTIVE) @map("trang_thai")
-  Order       Order[]
-  Review      Review[]
-  Car         Car[]
+  id            Int        @id @default(autoincrement()) @map("ma_nguoi_dung")
+  username      String     @unique @map("tai_khoan") @db.VarChar(100)
+  password      String     @map("mat_khau") @db.VarChar(100)
+  name          String?    @map("ten_nguoi_dung") @db.VarChar(255)
+  email         String?    @unique @map("email") @db.VarChar(100)
+  phone         String?    @unique @map("so_dien_thoai") @db.VarChar(11)
+  gender        Gender?    @default(OTHER) @map("gioi_tinh")
+  dateOfBirth   DateTime?  @map("ngay_sinh") @db.Date
+  address       String?    @map("dia_chi") @db.VarChar(255)
+  avatarUrl     String?    @map("avatar_url") @db.LongText
+  role          Role?      @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  roleId        Int?       @map("ma_vai_tro")
+  createdAt     DateTime   @default(now()) @map("ngay_tao")
+  updatedAt     DateTime   @updatedAt @map("ngay_cap_nhat")
+  status        UserStatus @default(ACTIVE) @map("trang_thai")
+  Order         Order[]
+  Review        Review[]
+  Car           Car[]
+  registerOwner Boolean    @default(false) @map("dang_ky_chu_xe")
+  registerAt    DateTime?  @map("ngay_dang_ky_chu_xe")
 
   @@map("nguoi_dung")
 }
@@ -191,7 +193,6 @@ enum RoleName {
   ADMIN    @map("QUAN_TRI_VIEN")
   CAROWNER @map("CHU_XE")
   TRAVELER @map("NGUOI_THUE_XE")
-  REGISTER @map("NGUOI_DUNG_DANG_KY")
 }
 
 enum UserStatus {

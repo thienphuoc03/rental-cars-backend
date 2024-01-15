@@ -305,4 +305,18 @@ export class UsersController {
   ownerRegistration(@Body() body: any, @GetCurrentUser() currentUser: any) {
     return this.usersService.ownerRegistration(body, currentUser);
   }
+
+  @UseGuards(RolesGuard)
+  @Roles(RoleName.ADMIN)
+  @Get('register/role/owner')
+  getAllOwnerRegistration() {
+    return this.usersService.getAllOwnerRegistration();
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(RoleName.ADMIN)
+  @Patch('register/role/owner/:id')
+  updateRequestOwnerRegistration(@Param('id') id: number, @Body() body: any) {
+    return this.usersService.updateRequestOwnerRegistration(id, body);
+  }
 }

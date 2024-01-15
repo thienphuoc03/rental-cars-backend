@@ -384,24 +384,82 @@ export class UsersService {
 
     if (isLicensePlates) throw new BadRequestException(`Biển số xe: ${licensePlates} đã tồn tại`);
 
-    const ownerRole = await this.prismaService.role.findFirst({
-      where: {
-        name: RoleName.REGISTER,
-      },
-      select: {
-        id: true,
-      },
-    });
-
     const user = await this.prismaService.user.update({
       where: {
         id: Number(currentUser.id),
       },
       data: {
-        roleId: Number(ownerRole.id),
+        registerOwner: true,
       },
     });
 
     return user;
+  }
+
+  async getAllOwnerRegistration(): Promise<any> {
+    const users = await this.prismaService.user.findMany({
+      where: {
+        registerOwner: true,
+      },
+      select: {
+        id: true,
+        name: true,
+        avatarUrl: true,
+        registerAt: true,
+      },
+      orderBy: {
+        registerAt: 'desc',
+      },
+    });
+
+    return users;
+  }
+
+  async updateRequestOwnerRegistration(id: number, body: any): Promise<any> {
+    const { isConfirm } = body;
+
+    if (isConfirm) {
+      const ownerRole = await this.prismaService.role.findFirst({
+        where: {
+          name: RoleName.CAROWNER,
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      const user = await this.prismaService.user.update({
+        where: {
+          id: Number(id),
+        },
+        data: {
+          registerOwner: false,
+          roleId: ownerRole.id,
+        },
+      });
+
+      return user;
+    } else {
+      const travelerRole = await this.prismaService.role.findFirst({
+        where: {
+          name: RoleName.TRAVELER,
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      const user = await this.prismaService.user.update({
+        where: {
+          id: Number(id),
+        },
+        data: {
+          registerOwner: false,
+          roleId: travelerRole.id,
+        },
+      });
+
+      return user;
+    }
   }
 }
