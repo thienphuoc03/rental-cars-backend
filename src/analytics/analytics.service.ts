@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { OrderDetailStatus } from '@prisma/client';
+import { OrderDetailStatus, RoleName } from '@prisma/client';
 import { addDays, endOfMonth, startOfMonth, subMonths } from 'date-fns';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -215,5 +215,53 @@ export class AnalyticsService {
     }
 
     return revenueByMonth;
+  }
+
+  async getUserTypeAnalytics(): Promise<any> {
+    const totalUsers = await this.prismaService.user.count();
+
+    const adminCount = await this.prismaService.user.count({
+      where: {
+        role: {
+          name: RoleName.ADMIN,
+        },
+      },
+    });
+
+    const ownerCount = await this.prismaService.user.count({
+      where: {
+        role: {
+          name: RoleName.CAROWNER,
+        },
+      },
+    });
+
+    const travelerCount = await this.prismaService.user.count({
+      where: {
+        role: {
+          name: RoleName.TRAVELER,
+        },
+      },
+    });
+
+    const data = [];
+
+    data.push({
+      name: 'Admin',
+      color: '#FFBB28',
+      value: adminCount,
+    });
+    data.push({
+      name: 'Chủ xe',
+      color: '#0088FE',
+      value: ownerCount,
+    });
+    data.push({
+      name: 'Khách thuê',
+      color: '#00C49F',
+      value: travelerCount,
+    });
+
+    return data;
   }
 }

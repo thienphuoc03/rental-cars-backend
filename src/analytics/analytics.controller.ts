@@ -56,4 +56,11 @@ export class AnalyticsController {
       throw new Error(error.message);
     }
   }
+
+  @UseGuards(RolesGuard)
+  @Roles(RoleName.ADMIN)
+  @Get('user-type')
+  getUserTypeAnalytics(): Promise<any> {
+    return this.analyticsService.getUserTypeAnalytics();
+  }
 }
