@@ -365,7 +365,7 @@ export class CarsService {
           where: {
             OR: [
               {
-                orderDetailStatus: 'CONFIRMED',
+                orderDetailStatus: 'COMPLETED',
               },
               {
                 orderDetailStatus: 'RECEIVED',
