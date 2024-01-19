@@ -177,7 +177,7 @@ export class OrderDetailController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles(RoleName.ADMIN, RoleName.CAROWNER)
+  @Roles(RoleName.ADMIN, RoleName.CAROWNER, RoleName.TRAVELER)
   @Patch('/update/status/:id')
   updateOrderDetailStatusById(@Param('id') id: number, @Body() updateOrderDetailDto: any): Promise<any> {
     return this.orderDetailService.updateOrderDetailStatusById(+id, updateOrderDetailDto);

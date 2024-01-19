@@ -245,7 +245,7 @@ export class OrderDetailService {
     const orderDetail = await this.prismaService.orderDetail.update({
       where: {
         id,
-        carId: updateOrderDetailDto.carId,
+        // carId: updateOrderDetailDto.carId,
       },
       data,
     });

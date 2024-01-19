@@ -106,7 +106,6 @@ export class AuthService {
     const { accessToken, refreshToken } = await this.generateToken(user.id, user.username, user.roleId, user.role.name);
 
     // Remove password from user object
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
     const { password: _, roleId, ...userWithoutPassword } = user;
 
     const userResponse = {
