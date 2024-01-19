@@ -319,4 +319,13 @@ export class UsersController {
   updateRequestOwnerRegistration(@Param('id') id: number, @Body() body: any) {
     return this.usersService.updateRequestOwnerRegistration(id, body);
   }
+
+  @UseGuards(RolesGuard)
+  @Roles(RoleName.ADMIN, RoleName.CAROWNER, RoleName.TRAVELER)
+  @Patch('password/update')
+  updatePassword(@Body() body: any, @GetCurrentUser() currentUser: any) {
+    const { id } = currentUser;
+
+    return this.usersService.updatePassword(id, body);
+  }
 }
