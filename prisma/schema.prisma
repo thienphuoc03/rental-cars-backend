@@ -86,7 +86,6 @@ model Car {
   updatedAt         DateTime      @updatedAt @map("ngay_cap_nhat")
   CarFeature        CarFeature[]
   OrderDetail       OrderDetail[]
-  Review            Review[]
   CarColor          CarColor?     @relation(fields: [carColorId], references: [id], onDelete: Cascade)
   carColorId        Int?          @map("ma_mau_sac_xe")
   CarImage          CarImage[]
@@ -171,20 +170,21 @@ model OrderDetail {
   serviceFee        Decimal?          @map("phi_dich_vu") @db.Decimal(10, 2)
   createdAt         DateTime          @default(now()) @map("ngay_tao")
   updatedAt         DateTime          @updatedAt @map("ngay_cap_nhat")
+  review            Review?
 
   @@map("chi_tiet_don_hang")
 }
 
 model Review {
-  id         Int      @id @default(autoincrement()) @map("ma_danh_gia")
-  content    String   @map("noi_dung") @db.Text
-  rating     Int      @map("danh_gia")
-  car        Car?     @relation(fields: [carId], references: [id], onDelete: Cascade)
-  carId      Int?     @map("ma_xe")
-  customer   User?    @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  customerId Int?     @map("ma_nguoi_dung")
-  createdAt  DateTime @default(now()) @map("ngay_tao")
-  updatedAt  DateTime @updatedAt @map("ngay_cap_nhat")
+  id            Int          @id @default(autoincrement()) @map("ma_danh_gia")
+  content       String       @map("noi_dung") @db.Text
+  rating        Int          @map("danh_gia")
+  orderDetail   OrderDetail? @relation(fields: [orderDetailId], references: [id], onDelete: Cascade)
+  orderDetailId Int?         @unique @map("ma_chi_tiet_don_hang")
+  customer      User?        @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customerId    Int?         @map("ma_nguoi_dung")
+  createdAt     DateTime     @default(now()) @map("ngay_tao")
+  updatedAt     DateTime     @updatedAt @map("ngay_cap_nhat")
 
   @@map("danh_gia")
 }
