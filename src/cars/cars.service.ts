@@ -361,6 +361,7 @@ export class CarsService {
             id: true,
             startDate: true,
             endDate: true,
+            review: true,
           },
           where: {
             OR: [
@@ -373,12 +374,6 @@ export class CarsService {
             ],
           },
         },
-        // Review: {
-        //   select: {
-        //     id: true,
-        //     rating: true,
-        //   },
-        // },
       },
     });
 
@@ -388,7 +383,15 @@ export class CarsService {
       images: car.CarImage.map((image) => image.url),
       thumbnail: car.CarImage[0].url,
       trips: car.OrderDetail.length,
-      // rating: car.Review.length > 0 ? car.Review.reduce((a, b) => a + b.rating, 0) / car.Review.length : 0,
+      rating:
+        car.OrderDetail.length > 0
+          ? car.OrderDetail.map((orderDetail) => {
+              if (!orderDetail.review) {
+                return 5;
+              }
+              return orderDetail.review.rating;
+            }).reduce((a, b) => a + b, 0) / car.OrderDetail.length
+          : 0,
       address: car.address.split(',')[0],
       orderDetails: car.OrderDetail.map((orderDetail) => ({
         startDate: orderDetail.startDate,
@@ -566,6 +569,7 @@ export class CarsService {
             id: true,
             startDate: true,
             endDate: true,
+            review: true,
           },
           where: {
             OR: [
@@ -578,12 +582,6 @@ export class CarsService {
             ],
           },
         },
-        // Review: {
-        //   select: {
-        //     id: true,
-        //     rating: true,
-        //   },
-        // },
       },
     });
 
@@ -593,7 +591,15 @@ export class CarsService {
         pricePerDay: formatDecimalToNumber(car.pricePerDay),
         thumbnail: car.CarImage[0].url,
         trips: car.OrderDetail.length,
-        // rating: car.Review.length > 0 ? car.Review.reduce((a, b) => a + b.rating, 0) / car.Review.length : 0,
+        rating:
+          car.OrderDetail.length > 0
+            ? car.OrderDetail.map((orderDetail) => {
+                if (!orderDetail.review) {
+                  return 5;
+                }
+                return orderDetail.review.rating;
+              }).reduce((a, b) => a + b, 0) / car.OrderDetail.length
+            : 0,
         address: car.address.split(',')[0],
         orderDetails: car.OrderDetail.map((orderDetail) => ({
           startDate: orderDetail.startDate,
