@@ -361,22 +361,17 @@ export class CarsService {
             id: true,
             startDate: true,
             endDate: true,
+            review: true,
           },
           where: {
             OR: [
               {
-                orderDetailStatus: 'CONFIRMED',
+                orderDetailStatus: 'COMPLETED',
               },
               {
                 orderDetailStatus: 'RECEIVED',
               },
             ],
-          },
-        },
-        Review: {
-          select: {
-            id: true,
-            rating: true,
           },
         },
       },
@@ -388,7 +383,15 @@ export class CarsService {
       images: car.CarImage.map((image) => image.url),
       thumbnail: car.CarImage[0].url,
       trips: car.OrderDetail.length,
-      rating: car.Review.length > 0 ? car.Review.reduce((a, b) => a + b.rating, 0) / car.Review.length : 0,
+      rating:
+        car.OrderDetail.length > 0
+          ? car.OrderDetail.map((orderDetail) => {
+              if (!orderDetail.review) {
+                return 5;
+              }
+              return orderDetail.review.rating;
+            }).reduce((a, b) => a + b, 0) / car.OrderDetail.length
+          : 0,
       address: car.address.split(',')[0],
       orderDetails: car.OrderDetail.map((orderDetail) => ({
         startDate: orderDetail.startDate,
@@ -435,24 +438,14 @@ export class CarsService {
         OrderDetail: {
           select: {
             id: true,
+            review: {
+              include: {
+                customer: true,
+              },
+            },
           },
           where: {
             orderDetailStatus: 'COMPLETED',
-          },
-        },
-        Review: {
-          select: {
-            id: true,
-            content: true,
-            rating: true,
-            customer: {
-              select: {
-                id: true,
-                name: true,
-                avatarUrl: true,
-              },
-            },
-            createdAt: true,
           },
         },
         user: {
@@ -475,17 +468,44 @@ export class CarsService {
       images: car.CarImage.map((image) => image.url),
       CarFeature: car.CarFeature.map((feature) => feature.feature.name),
       trips: car.OrderDetail.length,
-      rating: car.Review.length > 0 ? car.Review.reduce((a, b) => a + b.rating, 0) / car.Review.length : 0,
+      rating:
+        car.OrderDetail.length > 0
+          ? car.OrderDetail.map((orderDetail) => {
+              if (!orderDetail.review) {
+                return 5;
+              }
+              return orderDetail.review.rating;
+            }).reduce((a, b) => a + b, 0) / car.OrderDetail.length
+          : 0,
       owner: car.user,
       reviews: {
         meta: {
-          totalReviews: car.Review.length,
-          average: car.Review.length > 0 ? car.Review.reduce((a, b) => a + b.rating, 0) / car.Review.length : 0,
+          totalReviews: car.OrderDetail.map((orderDetail) => {
+            if (!orderDetail.review) {
+              return 0;
+            }
+            return 1;
+          }).reduce((a, b) => a + b, 0),
+          average:
+            car.OrderDetail.length > 0
+              ? car.OrderDetail.map((orderDetail) => {
+                  if (!orderDetail.review) {
+                    return 5;
+                  }
+                  return orderDetail.review.rating;
+                }).reduce((a, b) => a + b, 0) / car.OrderDetail.length
+              : 0,
         },
-        data: car.Review.map((review) => ({
-          ...review,
-          createdAt: review.createdAt.toISOString(),
-        })),
+        // data: car.OrderDetail.map((orderDetail) => ({
+        //   ...orderDetail.review,
+        // })),
+        data: car.OrderDetail.map(
+          (orderDetail) =>
+            orderDetail.review && {
+              ...orderDetail.review,
+              createdAt: orderDetail.review.createdAt.toISOString(),
+            },
+        ),
       },
       CarImage: undefined,
       OrderDetail: undefined,
@@ -549,6 +569,7 @@ export class CarsService {
             id: true,
             startDate: true,
             endDate: true,
+            review: true,
           },
           where: {
             OR: [
@@ -561,12 +582,6 @@ export class CarsService {
             ],
           },
         },
-        Review: {
-          select: {
-            id: true,
-            rating: true,
-          },
-        },
       },
     });
 
@@ -576,7 +591,15 @@ export class CarsService {
         pricePerDay: formatDecimalToNumber(car.pricePerDay),
         thumbnail: car.CarImage[0].url,
         trips: car.OrderDetail.length,
-        rating: car.Review.length > 0 ? car.Review.reduce((a, b) => a + b.rating, 0) / car.Review.length : 0,
+        rating:
+          car.OrderDetail.length > 0
+            ? car.OrderDetail.map((orderDetail) => {
+                if (!orderDetail.review) {
+                  return 5;
+                }
+                return orderDetail.review.rating;
+              }).reduce((a, b) => a + b, 0) / car.OrderDetail.length
+            : 0,
         address: car.address.split(',')[0],
         orderDetails: car.OrderDetail.map((orderDetail) => ({
           startDate: orderDetail.startDate,

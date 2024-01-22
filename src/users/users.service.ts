@@ -462,4 +462,36 @@ export class UsersService {
       return user;
     }
   }
+
+  async updatePassword(id: number, body: any): Promise<any> {
+    const { currentPassword, newPassword, confirmNewPassword } = body;
+
+    if (newPassword !== confirmNewPassword) throw new BadRequestException('Mật khẩu mới không khớp');
+
+    const userOld = await this.prismaService.user.findUnique({
+      where: {
+        id: Number(id),
+      },
+      select: {
+        password: true,
+      },
+    });
+
+    const isMatch = await bcrypt.compare(currentPassword, userOld.password);
+
+    if (!isMatch) throw new BadRequestException('Mật khẩu hiện tại không đúng');
+
+    const hashedPassword = await bcrypt.hash(currentPassword, 10);
+
+    const user = await this.prismaService.user.update({
+      where: {
+        id: Number(id),
+      },
+      data: {
+        password: hashedPassword,
+      },
+    });
+
+    return user;
+  }
 }

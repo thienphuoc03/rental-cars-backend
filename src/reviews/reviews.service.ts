@@ -59,7 +59,7 @@ export class ReviewsService {
         id: true,
         content: true,
         rating: true,
-        carId: true,
+        orderDetailId: true,
         customer: {
           select: {
             avatarUrl: true,
@@ -82,13 +82,13 @@ export class ReviewsService {
   async findAllByCarId(id: number): Promise<any> {
     const reviews = await this.prismaService.review.findMany({
       where: {
-        carId: id,
+        orderDetailId: id,
       },
       select: {
         id: true,
         content: true,
         rating: true,
-        carId: true,
+        orderDetailId: true,
         customer: {
           select: {
             avatarUrl: true,
@@ -120,7 +120,7 @@ export class ReviewsService {
         id: true,
         content: true,
         rating: true,
-        carId: true,
+        // carId: true,
         customer: {
           select: {
             avatarUrl: true,
