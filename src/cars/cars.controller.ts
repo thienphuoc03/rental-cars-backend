@@ -237,4 +237,15 @@ export class CarsController {
       throw new InternalServerErrorException(e);
     }
   }
+
+  @UseGuards(RolesGuard)
+  @Roles(RoleName.ADMIN)
+  @Get('/status/get-all')
+  getAllCarByStatus(@Query('status') status: string): Promise<any> {
+    try {
+      return this.carsService.getAllCarByStatus(status);
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
 }
