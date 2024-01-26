@@ -362,11 +362,12 @@ export class CarsService {
             startDate: true,
             endDate: true,
             review: true,
+            orderDetailStatus: true,
           },
           where: {
             OR: [
               {
-                orderDetailStatus: 'COMPLETED',
+                orderDetailStatus: 'CONFIRMED',
               },
               {
                 orderDetailStatus: 'RECEIVED',
