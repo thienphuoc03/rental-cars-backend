@@ -97,7 +97,7 @@ export class OrderDetailService {
       pricePerDay: formatDecimalToNumber(orderDetail.pricePerDay),
       deposits: formatDecimalToNumber(orderDetail.deposits),
       totalAmount: formatDecimalToNumber(orderDetail.totalAmount),
-      serviceFee: formatDecimalToNumber(orderDetail.serviceFee),
+      serviceFee: orderDetail.serviceFee ? formatDecimalToNumber(orderDetail.serviceFee) : 0,
       car: {
         ...orderDetail.car,
         pricePerDay: formatDecimalToNumber(orderDetail.car.pricePerDay),
