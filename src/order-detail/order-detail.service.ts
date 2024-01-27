@@ -69,7 +69,20 @@ export class OrderDetailService {
         },
         order: {
           include: {
-            traveler: true,
+            traveler: {
+              select: {
+                avatarUrl: true,
+                name: true,
+                email: true,
+                phone: true,
+                username: true,
+                Order: {
+                  select: {
+                    OrderDetail: true,
+                  },
+                },
+              },
+            },
           },
         },
       },
@@ -84,6 +97,7 @@ export class OrderDetailService {
       pricePerDay: formatDecimalToNumber(orderDetail.pricePerDay),
       deposits: formatDecimalToNumber(orderDetail.deposits),
       totalAmount: formatDecimalToNumber(orderDetail.totalAmount),
+      serviceFee: formatDecimalToNumber(orderDetail.serviceFee),
       car: {
         ...orderDetail.car,
         pricePerDay: formatDecimalToNumber(orderDetail.car.pricePerDay),
@@ -93,6 +107,29 @@ export class OrderDetailService {
         images: orderDetail.car.CarImage.map((image) => image.url),
         CarImage: undefined,
         CarColor: undefined,
+      },
+      traveler: {
+        ...orderDetail.order.traveler,
+        successTrips: orderDetail.order.traveler.Order.map(
+          (order) =>
+            order.OrderDetail.filter((orderDetail) => orderDetail.orderDetailStatus === OrderDetailStatus.COMPLETED)
+              .length,
+        ).reduce((acc, cur) => acc + cur, 0),
+        cancelTrips: orderDetail.order.traveler.Order.map(
+          (order) =>
+            order.OrderDetail.filter((orderDetail) => orderDetail.orderDetailStatus === OrderDetailStatus.CANCELED)
+              .length,
+        ).reduce((acc, cur) => acc + cur, 0),
+        totalTrips: orderDetail.order.traveler.Order.map(
+          (order) =>
+            order.OrderDetail.filter(
+              (orderDetail) =>
+                orderDetail.orderDetailStatus === OrderDetailStatus.COMPLETED ||
+                orderDetail.orderDetailStatus === OrderDetailStatus.CANCELED,
+            ).length,
+        ).reduce((acc, cur) => acc + cur, 0),
+
+        Order: undefined,
       },
     };
   }
