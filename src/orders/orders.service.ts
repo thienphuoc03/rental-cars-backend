@@ -143,6 +143,7 @@ export class OrdersService {
                 CarImage: true,
               },
             },
+            review: true,
           },
         },
       },

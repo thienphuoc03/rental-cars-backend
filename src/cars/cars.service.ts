@@ -362,11 +362,12 @@ export class CarsService {
             startDate: true,
             endDate: true,
             review: true,
+            orderDetailStatus: true,
           },
           where: {
             OR: [
               {
-                orderDetailStatus: 'COMPLETED',
+                orderDetailStatus: 'CONFIRMED',
               },
               {
                 orderDetailStatus: 'RECEIVED',
@@ -705,6 +706,36 @@ export class CarsService {
     const cars = await this.prismaService.car.findMany({
       where: {
         status: CarStatus.RENTING,
+      },
+      include: {
+        model: {
+          include: {
+            brand: true,
+          },
+        },
+        CarImage: true,
+        CarFeature: {
+          include: {
+            feature: true,
+          },
+        },
+      },
+    });
+
+    return cars.map((car) => ({
+      ...car,
+      model: car.model.name,
+      brand: car.model.brand.name,
+      CarImage: car.CarImage.map((image) => image.url),
+      CarFeature: car.CarFeature.map((feature) => feature.feature.name),
+      pricePerDay: formatDecimalToNumber(car.pricePerDay),
+    }));
+  }
+
+  async getAllCarByStatus(status: string): Promise<any> {
+    const cars = await this.prismaService.car.findMany({
+      where: {
+        status: status.toUpperCase() as CarStatus,
       },
       include: {
         model: {
