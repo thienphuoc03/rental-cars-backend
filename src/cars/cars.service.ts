@@ -11,8 +11,6 @@ export class CarsService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async createCar(createCarDto: any, currentUser: any): Promise<any> {
-    console.log({ createCarDto });
-
     const model = await this.prismaService.carModel.findFirst({
       where: {
         id: Number(createCarDto.modelId),
